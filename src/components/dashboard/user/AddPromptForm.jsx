@@ -3,14 +3,19 @@
 import React, { useState, useRef } from "react";
 import { Button } from "@heroui/react";
 import { Plus } from "@gravity-ui/icons";
-import { imageUpload } from "@/lib/imgUpload"; // মেন্টরের ইমেজ আপলোড হেল্পার
-import { addPrompt } from "@/lib/action/prompts"; // 🎯 আমাদের নতুন অ্যাকশন
+import { imageUpload } from "@/lib/imgUpload"; 
+import { addPrompt } from "@/lib/action/prompts"; 
+import toast from "react-hot-toast";
+import { authClient } from "@/lib/auth-client";
 
 export default function AddPromptForm({ totalExistingPrompts }) {
   const [loading, setLoading] = useState(false);
   const [imagePreview, setImagePreview] = useState(null); 
   const fileInputRef = useRef(null); 
   const isFreeLimitReached = totalExistingPrompts >= 3; 
+
+  const { data: session } = authClient.useSession(); 
+  const userEmail = session?.user?.email;       
 
   const handleUploadClick = () => {
     fileInputRef.current.click();
@@ -21,7 +26,7 @@ export default function AddPromptForm({ totalExistingPrompts }) {
     if (file) {
       const fileSizeInMB = file.size / (1024 * 1024);
       if (fileSizeInMB > 5) {
-        alert("Image size cannot exceed 5MB!");
+        toast.error("Image size cannot exceed 5MB!");
         e.target.value = "";
         setImagePreview(null);
         return;
@@ -30,25 +35,25 @@ export default function AddPromptForm({ totalExistingPrompts }) {
     }
   };
 
-  // 🎯 মेंटরের অবিকল ওয়ান-লাইনার ফর্ম সাবমিশন মেকানিজম
+ 
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (isFreeLimitReached) return;
     
     setLoading(true);
     try {
-      // ১. মেন্টরের অবিকল native FormData থেকে অবজেক্ট তৈরি
+     
       const formData = new FormData(e.target);
       const data = Object.fromEntries(formData.entries());
       
-      // ২. মেন্টরের মতো ImgBB এপিআই কল করে লাইভ ইমেজ ইউআরএল আনা
+     
       let uploadedImageUrl = "";
       if (data.image && data.image.size > 0) {
         const imageRes = await imageUpload(data.image);
         uploadedImageUrl = imageRes.url; 
       }
       
-      // 🎯 ৩. আপনার রিকোয়ারমেন্ট অবজেক্ট তৈরি
+     
       const promptProduct = {
         title: data.title,
         description: data.description,
@@ -58,22 +63,24 @@ export default function AddPromptForm({ totalExistingPrompts }) {
         tags: data.tags,
         difficultyLevel: data.difficultyLevel,
         visibility: data.visibility,
-        thumbnail: uploadedImageUrl, // ImgBB ইউআরএল
-        copyCount: 0,                // initially 0
-        status: "pending",           // Default pending
+        thumbnail: uploadedImageUrl, 
+        copyCount: 0,               
+        status: "pending", 
+        email: userEmail,          
       };
 
-      // ৪. সার্ভার অ্যাকশন কল
+      
       const result = await addPrompt(promptProduct);
       
       if (result.acknowledged) {
-        alert("Prompt submitted successfully!");
-        e.target.reset(); // ফর্ম ক্লিন
+        toast.success("Prompt submitted successfully!");
+        e.target.reset(); 
         setImagePreview(null);
       }
 
     } catch (error) {
       console.error("Submission failed:", error);
+      toast.error("Something went wrong. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -107,7 +114,7 @@ export default function AddPromptForm({ totalExistingPrompts }) {
           <label className="text-xs font-medium text-zinc-400">Prompt Title</label>
           <input 
             type="text" 
-            name="title" // 🎯 FormData ক্যাচ করার কী (Key)
+            name="title" 
             placeholder="Enter prompt title" 
             className="w-full bg-[#0b0813]/50 border border-purple-950/40 rounded-xl px-4 py-3 text-sm text-white placeholder-zinc-600 focus:outline-none focus:border-purple-500/50 transition-colors"
             required
@@ -118,7 +125,7 @@ export default function AddPromptForm({ totalExistingPrompts }) {
         <div className="flex flex-col gap-1.5">
           <label className="text-xs font-medium text-zinc-400">Prompt Description</label>
           <textarea 
-            name="description" // 🎯 FormData কী
+            name="description" 
             placeholder="Briefly describe what this prompt does" 
             rows={3}
             className="w-full bg-[#0b0813]/50 border border-purple-950/40 rounded-xl px-4 py-3 text-sm text-white placeholder-zinc-600 focus:outline-none focus:border-purple-500/50 transition-colors resize-none"
@@ -130,7 +137,7 @@ export default function AddPromptForm({ totalExistingPrompts }) {
         <div className="flex flex-col gap-1.5">
           <label className="text-xs font-medium text-zinc-400">Prompt Content</label>
           <textarea 
-            name="content" // 🎯 FormData কী
+            name="content" 
             placeholder="Paste the actual prompt code/text here" 
             rows={5}
             className="w-full bg-[#0b0813]/50 border border-purple-950/40 rounded-xl px-4 py-3 text-sm font-mono text-white placeholder-zinc-600 focus:outline-none focus:border-purple-500/50 transition-colors resize-none"
@@ -143,7 +150,7 @@ export default function AddPromptForm({ totalExistingPrompts }) {
           <div className="flex flex-col gap-1.5">
             <label className="text-xs font-medium text-zinc-400">Category</label>
             <select 
-              name="category" // 🎯 FormData কী
+              name="category" 
               className="w-full bg-[#0b0813]/80 border border-purple-950/40 rounded-xl px-4 py-3 text-sm text-zinc-300 focus:outline-none focus:border-purple-500/50 transition-colors"
               required
             >
@@ -151,13 +158,14 @@ export default function AddPromptForm({ totalExistingPrompts }) {
               <option value="marketing" className="bg-[#13112b]">Marketing</option>
               <option value="coding" className="bg-[#13112b]">Coding</option>
               <option value="writing" className="bg-[#13112b]">Creative Writing</option>
+              <option value="aiartdesign" className="bg-[#13112b]">AI Art & Design</option>
             </select>
           </div>
 
           <div className="flex flex-col gap-1.5">
             <label className="text-xs font-medium text-zinc-400">AI Tool</label>
             <select 
-              name="aiTool" // 🎯 FormData কী
+              name="aiTool" 
               className="w-full bg-[#0b0813]/80 border border-purple-950/40 rounded-xl px-4 py-3 text-sm text-zinc-300 focus:outline-none focus:border-purple-500/50 transition-colors"
               required
             >
@@ -176,7 +184,7 @@ export default function AddPromptForm({ totalExistingPrompts }) {
             <label className="text-xs font-medium text-zinc-400">Tags</label>
             <input 
               type="text" 
-              name="tags" // 🎯 FormData কী
+              name="tags" 
               placeholder="e.g. SEO, React, Copy" 
               className="w-full bg-[#0b0813]/50 border border-purple-950/40 rounded-xl px-4 py-3 text-sm text-white placeholder-zinc-600 focus:outline-none focus:border-purple-500/50 transition-colors"
             />
@@ -185,7 +193,7 @@ export default function AddPromptForm({ totalExistingPrompts }) {
           <div className="flex flex-col gap-1.5">
             <label className="text-xs font-medium text-zinc-400">Difficulty Level</label>
             <select 
-              name="difficultyLevel" // 🎯 FormData কী
+              name="difficultyLevel" 
               className="w-full bg-[#0b0813]/80 border border-purple-950/40 rounded-xl px-4 py-3 text-sm text-zinc-300 focus:outline-none focus:border-purple-500/50 transition-colors"
               required
             >
@@ -199,7 +207,7 @@ export default function AddPromptForm({ totalExistingPrompts }) {
           <div className="flex flex-col gap-1.5">
             <label className="text-xs font-medium text-zinc-400">Visibility</label>
             <select 
-              name="visibility" // 🎯 FormData কী
+              name="visibility" 
               className="w-full bg-[#0b0813]/80 border border-purple-950/40 rounded-xl px-4 py-3 text-sm text-zinc-300 focus:outline-none focus:border-purple-500/50 transition-colors"
               required
             >
@@ -215,7 +223,7 @@ export default function AddPromptForm({ totalExistingPrompts }) {
           <label className="text-xs font-medium text-zinc-400">Thumbnail Image (Max 5MB)</label>
           <input 
             type="file" 
-            name="image" // 🎯 মেন্টরের মতো ওরিজিনাল কি (Key) নাম "image"
+            name="image" 
             ref={fileInputRef} 
             onChange={handleFileChange} 
             accept="image/*" 

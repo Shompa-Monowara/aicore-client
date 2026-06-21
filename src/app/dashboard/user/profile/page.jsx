@@ -2,10 +2,12 @@ import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
 import Link from "next/link";
 import { Avatar } from "@heroui/react";
+import { getMyPrompts } from "@/lib/api/prompts"; // 🎯 নতুন import
 import {
   HiOutlineMail,
   HiOutlineDocumentText,
   HiOutlineCheckCircle,
+  HiOutlineXCircle,
   HiOutlineSparkles,
 } from "react-icons/hi";
 
@@ -17,8 +19,10 @@ export default async function ProfilePage() {
   const user = session?.user;
   const role = user?.role || "user";
   const plan = user?.plan || "free";
-
-  const promptsPublished = 0;
+  const isVerified = user?.emailVerified; 
+ 
+  const promptsData = await getMyPrompts(user?.email);
+  const promptsPublished = promptsData?.totalData || 0;
 
   return (
     <div className="max-w-7xl mx-auto">
@@ -64,12 +68,25 @@ export default async function ProfilePage() {
             <p className="text-2xl font-bold text-white mt-1">{promptsPublished}</p>
           </div>
 
+          {/*  Conditional Account Status */}
           <div className="bg-zinc-900/40 border border-purple-950/20 rounded-xl p-5">
-            <HiOutlineCheckCircle className="text-xl text-emerald-400" />
-            <p className="text-[11px] font-bold uppercase tracking-wider text-zinc-500 mt-2">
-              Account Status
-            </p>
-            <p className="text-2xl font-bold text-emerald-400 mt-1">Verified Member</p>
+            {isVerified ? (
+              <>
+                <HiOutlineCheckCircle className="text-xl text-emerald-400" />
+                <p className="text-[11px] font-bold uppercase tracking-wider text-zinc-500 mt-2">
+                  Account Status
+                </p>
+                <p className="text-2xl font-bold text-emerald-400 mt-1">Verified Member</p>
+              </>
+            ) : (
+              <>
+                <HiOutlineXCircle className="text-xl text-red-400" />
+                <p className="text-[11px] font-bold uppercase tracking-wider text-zinc-500 mt-2">
+                  Account Status
+                </p>
+                <p className="text-2xl font-bold text-red-400 mt-1">Unverified</p>
+              </>
+            )}
           </div>
         </div>
 

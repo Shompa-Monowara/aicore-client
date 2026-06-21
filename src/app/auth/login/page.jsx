@@ -16,6 +16,7 @@ import {
 import React from "react";
 import { FcGoogle } from "react-icons/fc"; 
 import { FiLogIn } from "react-icons/fi"; 
+import toast from "react-hot-toast";
 
 export default function SignInPage() {
   const onSubmit = async (e) => {
@@ -23,18 +24,25 @@ export default function SignInPage() {
     const formData = new FormData(e.currentTarget);
     const user = Object.fromEntries(formData.entries());
 
-    await authClient.signIn.email({
+    const { error } = await authClient.signIn.email({
       ...user,
       callbackURL: "/",
     });
+
+    if (error) {
+      toast.error(error.message || "Login failed. Please try again.");
+    }
   };
 
-
   const handleGoogleSignIn = async () => {
-    await authClient.signIn.social({
+    const { error } = await authClient.signIn.social({
       provider: "google",
       callbackURL: "/", 
     });
+
+    if (error) {
+      toast.error(error.message || "Google sign-in failed.");
+    }
   };
 
   const inputStyles = {

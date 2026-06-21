@@ -18,17 +18,17 @@ import {
 import { useRouter } from "next/navigation"; 
 import React from "react";
 import { FcGoogle } from "react-icons/fc"; 
+import toast from "react-hot-toast";
 
 export default function SignUpPage() {
   const router = useRouter(); 
 
- 
   const onSubmit = async (e) => {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
     const user = Object.fromEntries(formData.entries());
 
-    await authClient.signUp.email({
+    const { error } = await authClient.signUp.email({
       email: user.email,
       password: user.password,
       name: user.name,
@@ -40,15 +40,24 @@ export default function SignUpPage() {
       }
     });
 
-    router.push("/"); 
+    if (error) {
+      toast.error(error.message || "Signup failed. Please try again.");
+      return;
+    }
+
+    await authClient.signOut();
+    router.push("/auth/login");
   };
 
- 
   const handleGoogleSignUp = async () => {
-    await authClient.signIn.social({
+    const { error } = await authClient.signIn.social({
       provider: "google",
       callbackURL: "/", 
     });
+
+    if (error) {
+      toast.error(error.message || "Google sign-up failed.");
+    }
   };
 
   const inputStyles = {
