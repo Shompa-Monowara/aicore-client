@@ -1,7 +1,6 @@
 import { auth } from "@/lib/auth";
 import {
   Bars,
-  Plus,
   Folder,
   Bookmark,
   Comment,
@@ -10,39 +9,36 @@ import {
   Persons,
   CreditCard,
   CircleExclamation,
+  Plus,
 } from "@gravity-ui/icons";
-import { Button, Drawer } from "@heroui/react";
+import { Avatar, Button, Drawer } from "@heroui/react";
 import { headers } from "next/headers";
 import Link from "next/link";
 
-export default async function DashboardSidebar() {
+import DashboardLogoutButton from "./DashboardLogoutButton";
+import DashboardNavItem from "../DashboardNavItem";
 
+export default async function DashboardSidebar() {
   const session = await auth.api.getSession({
     headers: await headers(),
   });
 
   const user = session?.user;
+  const role = user?.role || "user";
 
-  const role = user?.role || "user"; 
-
- 
   const daashboardItems = {
-    
     user: [
-      { icon: Plus, label: "Add Prompt", link: "/dashboard/add-prompt" },
-      { icon: Folder, label: "My Prompts", link: "/dashboard/my-prompts" },
-      { icon: Bookmark, label: "Saved Prompts", link: "/dashboard/saved-prompts" },
-      { icon: Comment, label: "My Reviews", link: "/dashboard/my-reviews" },
-      { icon: Person, label: "Profile", link: "/dashboard/profile" },
+      { icon: Person, label: "My Profile", link: "/dashboard/user/profile" },
+      { icon: Plus, label: "Add Prompt", link: "/dashboard/user/add-prompt" },
+      { icon: Folder, label: "My Prompts", link: "/dashboard/user/my-prompts" },
+      { icon: Bookmark, label: "Saved Prompts", link: "/dashboard/user/saved-prompts" },
+      { icon: Comment, label: "My Reviews", link: "/dashboard/user/my-reviews" },
     ],
-
     creator: [
       { icon: ChartBar, label: "Creator Dashboard Home", link: "/dashboard/creator" },
       { icon: Plus, label: "Add Prompt", link: "/dashboard/creator/add-prompt" },
       { icon: Folder, label: "My Prompts", link: "/dashboard/creator/my-prompts" },
     ],
-
-
     admin: [
       { icon: Persons, label: "All Users", link: "/dashboard/admin/all-users" },
       { icon: Folder, label: "All Prompts", link: "/dashboard/admin/all-prompts" },
@@ -52,9 +48,7 @@ export default async function DashboardSidebar() {
     ],
   };
 
- 
-  const navItems = daashboardItems[role] ;
-  console.log(navItems);
+  const navItems = daashboardItems[role];
 
   return (
     <Drawer>
@@ -63,13 +57,13 @@ export default async function DashboardSidebar() {
         Menu
       </Button>
 
-    
-      <nav className="flex flex-col gap-1 w-[240px] h-screen border-r border-purple-950/30 bg-[#0b0813]/70 backdrop-blur-md p-4 font-sans">
-        
-       
-        <div className="border-b border-purple-950/20 pb-5 mb-4 pt-2 px-2"> 
-          <Link href="/">
-            <div className="flex items-center gap-2.5 cursor-pointer group">
+      <nav className="flex flex-col gap-1 w-[260px] h-screen border-r border-purple-950/20 bg-[#0b0813] p-4 font-sans shrink-0 justify-between">
+
+        {/* Top Content (Logo, Profile Preview, Nav Items) */}
+        <div className="flex flex-col gap-1">
+          {/* Brand Logo */}
+          <div className="pb-5 mb-4 pt-2 px-2">
+            <Link href="/" className="flex items-center gap-2.5 cursor-pointer group">
               <div className="relative flex items-center justify-center transition-transform duration-300 group-hover:scale-105">
                 <svg
                   className="h-7 w-7 text-orange-500 drop-shadow-[0_0_8px_rgba(249,115,22,0.5)]"
@@ -82,59 +76,41 @@ export default async function DashboardSidebar() {
                   <path strokeLinecap="round" strokeLinejoin="round" d="M19.071 4.929a10 10 0 00-14.142 0M19.071 4.929a10 10 0 010 14.142" />
                 </svg>
               </div>
-              
+
               <span className="text-2xl font-black tracking-tight text-white">
                 AI<span className="bg-gradient-to-r from-orange-400 via-amber-400 to-yellow-300 bg-clip-text text-transparent drop-shadow-[0_0_12px_rgba(251,146,60,0.2)]">Core</span>
               </span>
+            </Link>
+
+            {/* User Preview Card */}
+            <div className="mt-5 flex items-center gap-3 p-3 rounded-xl bg-zinc-900/30 border border-purple-950/20">
+              <Avatar size="sm" className="border border-purple-500/20 shrink-0">
+                <Avatar.Image referrerPolicy="no-referrer" alt={user?.name} src={user?.image} />
+                <Avatar.Fallback>{user?.name?.charAt(0) || "U"}</Avatar.Fallback>
+              </Avatar>
+              <div>
+                <p className="text-sm font-semibold text-white truncate max-w-[140px]">{user?.name || "User"}</p>
+                <p className="text-[10px] text-zinc-500 uppercase tracking-wider font-bold">{role}</p>
+              </div>
             </div>
-          </Link>
-          <div className="mt-2 px-1 text-[10px] uppercase tracking-wider text-orange-400/80 font-bold capitalize">
-            {role} Portal
+          </div>
+
+          {/* Sidebar Nav Items */}
+          <div className="flex flex-col gap-1.5">
+            {navItems.map((item) => (
+              <DashboardNavItem key={item.label} link={item.link} label={item.label}>
+                <item.icon className="size-5" />
+              </DashboardNavItem>
+            ))}
           </div>
         </div>
 
-      
-        <div className="flex flex-col gap-1.5 flex-1">
-          {navItems && navItems.map((item) => (
-            <Link key={item.label} href={item.link} className="w-full">
-              <button
-                className="flex w-full items-center gap-3 rounded-xl px-4 py-2.5 text-sm font-medium text-zinc-400 hover:bg-zinc-900/50 hover:text-white transition-all duration-200"
-                type="button"
-              >
-                <item.icon className="size-5 text-zinc-400 transition-colors" />
-                <span>{item.label}</span>
-              </button>
-            </Link>
-          ))}
+        {/* Bottom Logout Button */}
+        <div className="pt-4 border-t border-purple-950/20">
+          <DashboardLogoutButton />
         </div>
-      </nav>
 
-  
-      <Drawer.Backdrop>
-        <Drawer.Content placement="left" className="bg-[#0b0813] border-r border-purple-950/30 text-white font-sans">
-          <Drawer.Dialog>
-            <Drawer.CloseTrigger className="text-white" />
-            <Drawer.Header>
-              <Drawer.Heading className="text-xl font-black text-white pl-2">Navigation</Drawer.Heading>
-            </Drawer.Header>
-            <Drawer.Body>
-              <nav className="flex flex-col gap-2 mt-4">
-                {navItems && navItems.map((item) => (
-                  <Link key={item.label} href={item.link}>
-                    <button
-                      className="flex w-full items-center gap-3 rounded-xl px-4 py-2.5 text-sm font-medium text-zinc-400 hover:bg-zinc-900/50 hover:text-white transition-all duration-200"
-                      type="button"
-                    >
-                      <item.icon className="size-5 text-zinc-400" />
-                      <span>{item.label}</span>
-                    </button>
-                  </Link>
-                ))}
-              </nav>
-            </Drawer.Body>
-          </Drawer.Dialog>
-        </Drawer.Content>
-      </Drawer.Backdrop>
+      </nav>
     </Drawer>
   );
 }
