@@ -9,3 +9,13 @@ export const getAdminAnalytics = async () => {
   const data = await res.json();
   return data;
 };
+
+
+export const getAllUsers = async () => {
+  const res = await fetch(`${baseURl}/admin/users`, {
+    method: "GET",
+    headers: { "Content-Type": "application/json" },
+  });
+  const data = await res.json();
+  return data;
+};
