@@ -36,9 +36,11 @@ export default function RootLayout({ children }) {
     style: {
       background: "#13112b",
       color: "#fff",
-      border: "1px solid rgba(168, 85, 247, 0.2)",
     },
-  }}/>
+  }}
+  toastOptions={{
+              duration: 3000,
+            }}/>
       </body>
     </html>
   );
