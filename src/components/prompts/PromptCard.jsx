@@ -1,5 +1,7 @@
 "use client";
 
+import Link from "next/link";
+
 export default function PromptCard({ prompt, onViewDetails }) {
   return (
     <div className="bg-[#0f0f1a] border border-white/10 rounded-xl overflow-hidden hover:border-primary/50 transition-all duration-200 flex flex-col">
@@ -67,12 +69,12 @@ export default function PromptCard({ prompt, onViewDetails }) {
 
       {/* Button */}
       <div className="px-4 pb-4">
-        <button
-          onClick={() => onViewDetails(prompt._id)}
-          className="w-full bg-primary hover:bg-primary/90 text-white font-semibold py-2.5 rounded-lg flex items-center justify-center gap-2 transition-all"
-        >
-          <span>👁</span> View Details
-        </button>
+        <Link
+ href={`/all-prompts/${prompt._id}`}
+  className="w-full bg-primary hover:bg-primary/90 text-white font-semibold py-2.5 rounded-lg flex items-center justify-center gap-2 transition-all text-center"
+>
+  <span>👁</span> View Details
+</Link>
       </div>
     </div>
   );

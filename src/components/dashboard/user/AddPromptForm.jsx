@@ -168,6 +168,8 @@ export default function AddPromptForm({ totalExistingPrompts }) {
               <option value="coding" className="bg-[#13112b]">Coding</option>
               <option value="writing" className="bg-[#13112b]">Creative Writing</option>
               <option value="aiartdesign" className="bg-[#13112b]">AI Art & Design</option>
+             
+              <option value="graphics-image" className="bg-[#13112b]">Graphics & Image</option>
             </select>
           </div>
 

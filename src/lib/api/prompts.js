@@ -5,8 +5,7 @@ export const getPrompts = async () => {
     method: "GET",
     headers: { "Content-Type": "application/json" },
   });
-  const data = await res.json();
-  return data;
+  return await res.json();
 };
 
 export const getMyPrompts = async (email) => {
@@ -14,8 +13,7 @@ export const getMyPrompts = async (email) => {
     method: "GET",
     headers: { "Content-Type": "application/json" },
   });
-  const data = await res.json();
-  return data;
+  return await res.json();
 };
 
 export const fetchPublicPrompts = async ({
@@ -27,16 +25,26 @@ export const fetchPublicPrompts = async ({
   page = 1,
   limit = 9,
 } = {}) => {
-  const params = new URLSearchParams({
-    search,
-    category,
-    aiTool,
-    difficulty,
-    sort,
-    page,
-    limit,
-  });
+  const params = new URLSearchParams({ search, category, aiTool, difficulty, sort, page, limit });
   const res = await fetch(`${baseURl}/prompts/public?${params}`);
-  const data = await res.json();
-  return data;
+  return await res.json();
+};
+
+export const getPromptById = async (id) => {
+  if (!id) return null;
+  const cleanId = typeof id === "object" ? (id?.$oid || id?.toString()) : id;
+  const res = await fetch(`${baseURl}/prompts/${cleanId}`);
+  if (!res.ok) return null;
+  return await res.json();
+};
+
+export const getPromptReviews = async (promptId) => {
+  const res = await fetch(`${baseURl}/reviews/${promptId}`);
+  return await res.json();
+};
+
+export const checkBookmarkStatus = async (email, promptId) => {
+  if (!email) return { bookmarked: false };
+  const res = await fetch(`${baseURl}/bookmarks/status?email=${email}&promptId=${promptId}`);
+  return await res.json();
 };

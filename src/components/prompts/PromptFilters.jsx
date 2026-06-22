@@ -2,8 +2,6 @@
 
 import { AI_TOOLS, CATEGORIES, DIFFICULTIES } from "@/lib/action/promptActions";
 
-
-//  FilterGroup 
 function FilterGroup({ title, items, selected, onSelect }) {
   return (
     <div className="mb-6">

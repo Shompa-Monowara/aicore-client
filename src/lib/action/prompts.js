@@ -8,15 +8,12 @@ export const addPrompt = async (prompt) => {
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(prompt),
   });
-  const data = await res.json();
-  return data;
+  return await res.json();
 };
-
 
 export const deletePrompt = async (id) => {
   const res = await fetch(`${baseURl}/user/prompts/${id}`, {
     method: "DELETE",
   });
-  const data = await res.json();
-  return data;
+  return await res.json();
 };

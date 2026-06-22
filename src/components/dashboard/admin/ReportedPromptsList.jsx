@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import {
   dismissReport,
   warnCreator,
@@ -127,13 +128,13 @@ export default function ReportedPromptsList({ reports }) {
             </div>
 
             <div className="flex items-center gap-2">
-              <button
-                disabled
-                title="Inspect (coming soon)"
-                className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold text-zinc-500 bg-zinc-900/50 cursor-not-allowed"
+              <Link
+                href={`/all-prompts/${report.promptId}`}
+                title="Inspect reported prompt"
+                className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold text-zinc-300 bg-zinc-900/50 hover:bg-zinc-800 hover:text-white transition-colors"
               >
                 <HiOutlineEye className="text-sm" /> Inspect
-              </button>
+              </Link>
 
               <button
                 onClick={() => handleDismiss(report._id)}

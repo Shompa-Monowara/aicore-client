@@ -53,12 +53,18 @@ export default function AllPromptsPage() {
     setPage(1);
   }, [search, category, aiTool, difficulty, sort]);
 
+  
   const handleViewDetails = (id) => {
-    if (!session) {
-      router.push("/login");
-    } else {
-      router.push(`/prompts/${id}`);
+    if (!id) {
+      console.error("Prompt ID is missing!");
+      return;
     }
+    
+   
+    const promptId = typeof id === 'object' ? (id?.$oid || id?.toString()) : id;
+    
+
+    router.push(`/all-prompts/${promptId}`);
   };
 
   const handleClear = () => {
