@@ -40,11 +40,12 @@ export default async function DashboardSidebar() {
       { icon: Folder, label: "My Prompts", link: "/dashboard/creator/my-prompts" },
     ],
     admin: [
+      { icon: Person, label: "My Profile", link: "/dashboard/admin/profile" },
+      { icon: ChartBar, label: "Admin Analytics", link: "/dashboard/admin/analytics" },
       { icon: Persons, label: "All Users", link: "/dashboard/admin/all-users" },
       { icon: Folder, label: "All Prompts", link: "/dashboard/admin/all-prompts" },
       { icon: CreditCard, label: "All Payments", link: "/dashboard/admin/all-payments" },
       { icon: CircleExclamation, label: "Reported Prompts", link: "/dashboard/admin/reported-prompts" },
-      { icon: ChartBar, label: "Analytics", link: "/dashboard/admin/analytics" },
     ],
   };
 

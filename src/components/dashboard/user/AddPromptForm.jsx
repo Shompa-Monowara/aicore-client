@@ -3,6 +3,7 @@
 import React, { useState, useRef } from "react";
 import { Button } from "@heroui/react";
 import { Plus } from "@gravity-ui/icons";
+import { HiOutlineUpload } from "react-icons/hi";
 import { imageUpload } from "@/lib/imgUpload"; 
 import { addPrompt } from "@/lib/action/prompts"; 
 import toast from "react-hot-toast";
@@ -111,7 +112,9 @@ export default function AddPromptForm({ totalExistingPrompts }) {
         
         {/* Title */}
         <div className="flex flex-col gap-1.5">
-          <label className="text-xs font-medium text-zinc-400">Prompt Title</label>
+          <label className="text-xs font-medium text-zinc-400 uppercase tracking-wider">
+            Prompt Title <span className="text-orange-400">*</span>
+          </label>
           <input 
             type="text" 
             name="title" 
@@ -123,7 +126,9 @@ export default function AddPromptForm({ totalExistingPrompts }) {
 
         {/* Description */}
         <div className="flex flex-col gap-1.5">
-          <label className="text-xs font-medium text-zinc-400">Prompt Description</label>
+          <label className="text-xs font-medium text-zinc-400 uppercase tracking-wider">
+            Prompt Description <span className="text-orange-400">*</span>
+          </label>
           <textarea 
             name="description" 
             placeholder="Briefly describe what this prompt does" 
@@ -135,7 +140,9 @@ export default function AddPromptForm({ totalExistingPrompts }) {
 
         {/* Content */}
         <div className="flex flex-col gap-1.5">
-          <label className="text-xs font-medium text-zinc-400">Prompt Content</label>
+          <label className="text-xs font-medium text-zinc-400 uppercase tracking-wider">
+            Prompt Content <span className="text-orange-400">*</span>
+          </label>
           <textarea 
             name="content" 
             placeholder="Paste the actual prompt code/text here" 
@@ -145,10 +152,12 @@ export default function AddPromptForm({ totalExistingPrompts }) {
           />
         </div>
 
-        {/* Row 1: Category & AI Tool */}
+        {/* Row 1: Category & AI Engine */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="flex flex-col gap-1.5">
-            <label className="text-xs font-medium text-zinc-400">Category</label>
+            <label className="text-xs font-medium text-zinc-400 uppercase tracking-wider">
+              Category <span className="text-orange-400">*</span>
+            </label>
             <select 
               name="category" 
               className="w-full bg-[#0b0813]/80 border border-purple-950/40 rounded-xl px-4 py-3 text-sm text-zinc-300 focus:outline-none focus:border-purple-500/50 transition-colors"
@@ -163,7 +172,9 @@ export default function AddPromptForm({ totalExistingPrompts }) {
           </div>
 
           <div className="flex flex-col gap-1.5">
-            <label className="text-xs font-medium text-zinc-400">AI Tool</label>
+            <label className="text-xs font-medium text-zinc-400 uppercase tracking-wider">
+              AI Engine <span className="text-orange-400">*</span>
+            </label>
             <select 
               name="aiTool" 
               className="w-full bg-[#0b0813]/80 border border-purple-950/40 rounded-xl px-4 py-3 text-sm text-zinc-300 focus:outline-none focus:border-purple-500/50 transition-colors"
@@ -178,20 +189,12 @@ export default function AddPromptForm({ totalExistingPrompts }) {
           </div>
         </div>
 
-        {/* Row 2: Tags, Difficulty, Visibility */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        {/* Row 2: Difficulty Level & Visibility Status */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="flex flex-col gap-1.5">
-            <label className="text-xs font-medium text-zinc-400">Tags</label>
-            <input 
-              type="text" 
-              name="tags" 
-              placeholder="e.g. SEO, React, Copy" 
-              className="w-full bg-[#0b0813]/50 border border-purple-950/40 rounded-xl px-4 py-3 text-sm text-white placeholder-zinc-600 focus:outline-none focus:border-purple-500/50 transition-colors"
-            />
-          </div>
-
-          <div className="flex flex-col gap-1.5">
-            <label className="text-xs font-medium text-zinc-400">Difficulty Level</label>
+            <label className="text-xs font-medium text-zinc-400 uppercase tracking-wider">
+              Difficulty Level <span className="text-orange-400">*</span>
+            </label>
             <select 
               name="difficultyLevel" 
               className="w-full bg-[#0b0813]/80 border border-purple-950/40 rounded-xl px-4 py-3 text-sm text-zinc-300 focus:outline-none focus:border-purple-500/50 transition-colors"
@@ -204,23 +207,54 @@ export default function AddPromptForm({ totalExistingPrompts }) {
             </select>
           </div>
 
-          <div className="flex flex-col gap-1.5">
-            <label className="text-xs font-medium text-zinc-400">Visibility</label>
-            <select 
-              name="visibility" 
-              className="w-full bg-[#0b0813]/80 border border-purple-950/40 rounded-xl px-4 py-3 text-sm text-zinc-300 focus:outline-none focus:border-purple-500/50 transition-colors"
-              required
-            >
-              <option value="" disabled selected>Select Visibility</option>
-              <option value="public" className="bg-[#13112b]">Public</option>
-              <option value="private" className="bg-[#13112b]">Private</option>
-            </select>
+          <div className="flex flex-col gap-2">
+            <label className="text-xs font-medium text-zinc-400 uppercase tracking-wider">
+              Visibility Status <span className="text-orange-400">*</span>
+            </label>
+            <div className="flex flex-wrap items-center gap-5 h-[46px]">
+              <label className="flex items-center gap-2 cursor-pointer text-sm text-zinc-300">
+                <input
+                  type="radio"
+                  name="visibility"
+                  value="public"
+                  defaultChecked
+                  required
+                  className="size-4 accent-orange-500 cursor-pointer"
+                />
+                Public (Free access)
+              </label>
+
+              <label className="flex items-center gap-2 cursor-pointer text-sm text-zinc-300">
+                <input
+                  type="radio"
+                  name="visibility"
+                  value="private"
+                  className="size-4 accent-orange-500 cursor-pointer"
+                />
+                Private (Premium lock)
+              </label>
+            </div>
           </div>
+        </div>
+
+        {/* Tags */}
+        <div className="flex flex-col gap-1.5">
+          <label className="text-xs font-medium text-zinc-400 uppercase tracking-wider">
+            Tags (Comma-Separated)
+          </label>
+          <input 
+            type="text" 
+            name="tags" 
+            placeholder="e.g. tailwind, card, component, responsive" 
+            className="w-full bg-[#0b0813]/50 border border-purple-950/40 rounded-xl px-4 py-3 text-sm text-white placeholder-zinc-600 focus:outline-none focus:border-purple-500/50 transition-colors"
+          />
         </div>
 
         {/* Thumbnail Image upload */}
         <div className="flex flex-col gap-2">
-          <label className="text-xs font-medium text-zinc-400">Thumbnail Image (Max 5MB)</label>
+          <label className="text-xs font-medium text-zinc-400 uppercase tracking-wider">
+            Thumbnail Image Upload
+          </label>
           <input 
             type="file" 
             name="image" 
@@ -243,9 +277,15 @@ export default function AddPromptForm({ totalExistingPrompts }) {
                 </div>
               </div>
             ) : (
-              <p className="text-xs text-zinc-500">
-                Click to upload or drag & drop your thumbnail image
-              </p>
+              <>
+                <HiOutlineUpload className="text-2xl text-zinc-400 mb-2" />
+                <p className="text-sm font-bold text-white">
+                  Click to choose a thumbnail image file
+                </p>
+                <p className="text-xs text-zinc-500 mt-1">
+                  Supports PNG, JPG, or WEBP (Max 2MB)
+                </p>
+              </>
             )}
           </div>
         </div>
