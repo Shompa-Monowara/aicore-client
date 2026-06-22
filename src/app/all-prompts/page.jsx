@@ -8,6 +8,27 @@ import PromptFilters from "@/components/prompts/PromptFilters";
 import PromptCard from "@/components/prompts/PromptCard";
 import { SORT_OPTIONS } from "@/lib/action/promptActions";
 
+// মেন্টরের পেজ নাম্বার জেনারেট করার ফর্মুলা
+const getPageNumbers = (page, totalPages) => {
+  const pages = [];
+  pages.push(1);
+  if (page > 3) {
+    pages.push("ellipsis");
+  }
+  const start = Math.max(2, page - 1);
+  const end = Math.min(totalPages - 1, page + 1);
+  for (let i = start; i <= end; i++) {
+    pages.push(i);
+  }
+  if (page < totalPages - 2) {
+    pages.push("ellipsis");
+  }
+  if (totalPages > 1) {
+    pages.push(totalPages);
+  }
+  return pages;
+};
+
 export default function AllPromptsPage() {
   const { data: session } = authClient.useSession();
   const router = useRouter();
@@ -53,18 +74,14 @@ export default function AllPromptsPage() {
     setPage(1);
   }, [search, category, aiTool, difficulty, sort]);
 
-  
   const handleViewDetails = (id) => {
-    if (!id) {
-      console.error("Prompt ID is missing!");
-      return;
+    if (!id) return;
+    const promptId = typeof id === "object" ? (id?.$oid || id?.toString()) : id;
+    if (!session) {
+      router.push("/login");
+    } else {
+      router.push(`/all-prompts/${promptId}`);
     }
-    
-   
-    const promptId = typeof id === 'object' ? (id?.$oid || id?.toString()) : id;
-    
-
-    router.push(`/all-prompts/${promptId}`);
   };
 
   const handleClear = () => {
@@ -74,6 +91,9 @@ export default function AllPromptsPage() {
     setDifficulty("");
     setSort("latest");
   };
+
+  const startItem = total === 0 ? 0 : (page - 1) * 9 + 1;
+  const endItem = Math.min(page * 9, total);
 
   return (
     <div className="min-h-screen bg-[#080810] text-white">
@@ -119,9 +139,7 @@ export default function AllPromptsPage() {
                   {s.label}
                 </button>
               ))}
-              <span className="ml-auto text-default-500 text-xs">
-                {total} prompts
-              </span>
+              {/* আপনার মার্ক করা "{total} prompts" টেক্সটটি এখান থেকে সরিয়ে দেওয়া হয়েছে */}
             </div>
 
             {/* Results */}
@@ -151,24 +169,56 @@ export default function AllPromptsPage() {
                   ))}
                 </div>
 
-                {/* Pagination */}
+                {/* Mentor-style Custom Pagination with your UI Theme */}
                 {totalPages > 1 && (
-                  <div className="flex justify-center gap-2 mt-8">
-                    {Array.from({ length: totalPages }, (_, i) => i + 1).map(
-                      (p) => (
-                        <button
-                          key={p}
-                          onClick={() => setPage(p)}
-                          className={`w-9 h-9 rounded-lg text-sm font-medium transition-all ${
-                            page === p
-                              ? "bg-primary text-white"
-                              : "bg-[#0f0f1a] text-default-400 border border-white/10 hover:border-primary"
-                          }`}
-                        >
-                          {p}
-                        </button>
-                      )
-                    )}
+                  <div className="flex flex-col items-center gap-4 mt-8 w-full">
+                    <p className="text-default-400 text-sm">
+                      Showing {startItem}-{endItem} of {total} results
+                    </p>
+                    
+                    <div className="flex items-center gap-2 select-none">
+                      {/* Previous Button */}
+                      <button
+                        disabled={page === 1}
+                        onClick={() => setPage((p) => Math.max(1, p - 1))}
+                        className="px-3 py-1.5 rounded-lg bg-[#0f0f1a] border border-white/10 text-default-400 hover:border-primary disabled:opacity-50 disabled:hover:border-white/10 disabled:cursor-not-allowed transition-all text-sm flex items-center gap-1"
+                      >
+                        <span>&larr;</span> Previous
+                      </button>
+
+                      {/* Page Numbers & Ellipsis */}
+                      {getPageNumbers(page, totalPages).map((p, i) =>
+                        p === "ellipsis" ? (
+                          <span
+                            key={`ellipsis-${i}`}
+                            className="px-3 py-1.5 text-default-400"
+                          >
+                            ...
+                          </span>
+                        ) : (
+                          <button
+                            key={p}
+                            onClick={() => setPage(p)}
+                            className={`px-3 py-1.5 rounded-lg text-sm font-semibold border transition-all ${
+                              p === page
+                                ? "bg-primary text-white border-primary"
+                                : "bg-[#0f0f1a] border-white/10 text-default-400 hover:border-primary"
+                            }`}
+                          >
+                            {p}
+                          </button>
+                        )
+                      )}
+
+                      {/* Next Button */}
+                      <button
+                        disabled={page === totalPages}
+                        onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+                        className="px-3 py-1.5 rounded-lg bg-[#0f0f1a] border border-white/10 text-default-400 hover:border-primary disabled:opacity-50 disabled:hover:border-white/10 disabled:cursor-not-allowed transition-all text-sm flex items-center gap-1"
+                      >
+                        Next <span>&rarr;</span>
+                      </button>
+                    </div>
                   </div>
                 )}
               </>
