@@ -19,3 +19,22 @@ export const getAllUsers = async () => {
   const data = await res.json();
   return data;
 };
+
+// new 
+export const getAllPrompts = async () => {
+  const res = await fetch(`${baseURl}/admin/prompts`, {
+    method: "GET",
+    headers: { "Content-Type": "application/json" },
+  });
+  const data = await res.json();
+  return data;
+};
+
+export const getReportedPrompts = async () => {
+  const res = await fetch(`${baseURl}/admin/reports`, {
+    method: "GET",
+    headers: { "Content-Type": "application/json" },
+  });
+  const data = await res.json();
+  return data;
+};
