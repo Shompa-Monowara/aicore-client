@@ -9,24 +9,27 @@ function FilterGroup({ title, items, selected, onSelect }) {
         {title}
       </p>
       <div className="flex flex-col gap-1">
+        {/* "All" বাটন - মেন্টরের মতো অ্যাক্টিভ স্টাইল যোগ করা হয়েছে */}
         <button
           onClick={() => onSelect("")}
-          className={`text-left px-3 py-2 rounded-lg text-sm transition-all ${
+          className={`text-left px-3 py-2 rounded-lg text-sm transition-all border ${
             selected === ""
-              ? "bg-primary text-white font-medium"
-              : "text-default-400 hover:text-white hover:bg-default-100"
+              ? "bg-purple-500/10 text-purple-400 border-purple-500/40 font-medium shadow-sm shadow-purple-500/5"
+              : "text-default-400 border-transparent hover:text-white hover:bg-default-100/5"
           }`}
         >
           All
         </button>
+        
+        {/* অন্যান্য ডাইনামিক বাটনগুলো */}
         {items.map((item) => (
           <button
             key={item}
             onClick={() => onSelect(item)}
-            className={`text-left px-3 py-2 rounded-lg text-sm transition-all ${
+            className={`text-left px-3 py-2 rounded-lg text-sm transition-all border ${
               selected === item
-                ? "bg-primary text-white font-medium"
-                : "text-default-400 hover:text-white hover:bg-default-100"
+                ? "bg-purple-500/10 text-purple-400 border-purple-500/40 font-medium shadow-sm shadow-purple-500/5"
+                : "text-default-400 border-transparent hover:text-white hover:bg-default-100/5"
             }`}
           >
             {item}

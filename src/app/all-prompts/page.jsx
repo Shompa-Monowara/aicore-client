@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useState, useCallback } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation"; // useSearchParams ইম্পোর্ট করা হয়েছে
 import { authClient } from "@/lib/auth-client";
 import { fetchPublicPrompts } from "@/lib/api/prompts";
 
@@ -8,7 +8,7 @@ import PromptFilters from "@/components/prompts/PromptFilters";
 import PromptCard from "@/components/prompts/PromptCard";
 import { SORT_OPTIONS } from "@/lib/action/promptActions";
 
-
+// মেন্টরের পেজ নাম্বার জেনারেট করার ফর্মুলা
 const getPageNumbers = (page, totalPages) => {
   const pages = [];
   pages.push(1);
@@ -32,6 +32,10 @@ const getPageNumbers = (page, totalPages) => {
 export default function AllPromptsPage() {
   const { data: session } = authClient.useSession();
   const router = useRouter();
+  const searchParams = useSearchParams(); // ইউআরএল কুয়েরি রিড করার জন্য
+
+  // হোম পেজ থেকে আসা সার্চ কুয়েরি শুরুতে সেট করার জন্য initial state হ্যান্ডেল করা হলো
+  const querySearch = searchParams.get("search") || "";
 
   const [prompts, setPrompts] = useState([]);
   const [total, setTotal] = useState(0);
@@ -39,11 +43,19 @@ export default function AllPromptsPage() {
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
 
-  const [search, setSearch] = useState("");
+  const [search, setSearch] = useState(querySearch); // ডিফল্ট ভ্যালু querySearch দেওয়া হলো
   const [category, setCategory] = useState("");
   const [aiTool, setAiTool] = useState("");
   const [difficulty, setDifficulty] = useState("");
   const [sort, setSort] = useState("latest");
+
+  // যদি ইউআরএল প্যারামিটার পরিবর্তন হয় (যেমন ইউজার হোম পেজে আবার নতুন কিছু লিখে সার্চ করে আসে)
+  useEffect(() => {
+    if (querySearch) {
+      setSearch(querySearch);
+      setPage(1);
+    }
+  }, [querySearch]);
 
   const loadPrompts = useCallback(async () => {
     setLoading(true);
@@ -90,6 +102,8 @@ export default function AllPromptsPage() {
     setAiTool("");
     setDifficulty("");
     setSort("latest");
+    // ইউআরএল থেকে সার্চ কুয়েরি ক্লিন করার জন্য
+    router.push("/all-prompts");
   };
 
   const startItem = total === 0 ? 0 : (page - 1) * 9 + 1;
@@ -139,7 +153,6 @@ export default function AllPromptsPage() {
                   {s.label}
                 </button>
               ))}
-              {/* আপনার মার্ক করা "{total} prompts" টেক্সটটি এখান থেকে সরিয়ে দেওয়া হয়েছে */}
             </div>
 
             {/* Results */}
