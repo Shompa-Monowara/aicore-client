@@ -8,7 +8,7 @@ import PromptFilters from "@/components/prompts/PromptFilters";
 import PromptCard from "@/components/prompts/PromptCard";
 import { SORT_OPTIONS } from "@/lib/action/promptActions";
 
-// মেন্টরের পেজ নাম্বার জেনারেট করার ফর্মুলা
+
 const getPageNumbers = (page, totalPages) => {
   const pages = [];
   pages.push(1);

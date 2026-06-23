@@ -12,6 +12,7 @@ import {
   HiStar,
   HiOutlineStar,
   HiOutlineUser,
+  HiArrowLeft, // Back arrow আইকনটি ইম্পোর্ট করা হলো
 } from "react-icons/hi";
 
 const REPORT_REASONS = ["Inappropriate Content", "Spam", "Copyright Violation", "Other"];
@@ -127,6 +128,18 @@ export default function PromptDetailClient({ prompt, reviews, user, initialBookm
   return (
     <div className="min-h-screen bg-[#080810] text-white">
       <div className="max-w-5xl mx-auto px-4 py-10">
+        
+        {/* ডেমো অনুযায়ী Back to previous page বাটন */}
+        <div className="mb-6">
+          <button
+            onClick={() => router.back()}
+            className="flex items-center gap-2 text-sm text-default-400 hover:text-white transition-colors font-medium group"
+          >
+            <HiArrowLeft className="text-base transform group-hover:-translate-x-0.5 transition-transform" />
+            <span>Back to previous page</span>
+          </button>
+        </div>
+
         {/* Header */}
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
@@ -134,9 +147,13 @@ export default function PromptDetailClient({ prompt, reviews, user, initialBookm
               <span className="px-2.5 py-1 rounded-full text-[11px] font-bold uppercase bg-purple-500/15 text-purple-300 border border-purple-500/30">
                 {prompt.aiTool}
               </span>
-              <span className="px-2.5 py-1 rounded-full text-[11px] font-bold uppercase bg-zinc-800 text-zinc-300 border border-zinc-700">
-                {prompt.difficultyLevel}
-              </span>
+              
+              {/* ফিক্সড লাইন: এখানে prompt.difficulty অথবা prompt.difficultyLevel চেক করা হয়েছে */}
+              {(prompt.difficulty || prompt.difficultyLevel) && (
+                <span className="px-2.5 py-1 rounded-full text-[11px] font-bold uppercase bg-zinc-800 text-zinc-300 border border-zinc-700">
+                  {prompt.difficulty || prompt.difficultyLevel}
+                </span>
+              )}
             </div>
             <h1 className="text-3xl font-black text-white">{prompt.title}</h1>
             <p className="text-zinc-400 mt-2 max-w-2xl">{prompt.description}</p>
