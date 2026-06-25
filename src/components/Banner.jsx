@@ -54,7 +54,7 @@ export default function Banner() {
           variants={fadeInUp}
           className="inline-block px-3 py-1 rounded-full text-xs font-semibold uppercase bg-purple-500/10 text-purple-400 border border-purple-500/20 mb-6 tracking-wider"
         >
-          🚀 Maximize Your Productivity with AI
+           Maximize Your Productivity with AI
         </motion.span>
 
         {/* Heading */}

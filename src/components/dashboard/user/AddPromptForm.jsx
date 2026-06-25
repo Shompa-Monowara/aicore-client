@@ -4,19 +4,19 @@ import React, { useState, useRef } from "react";
 import { Button } from "@heroui/react";
 import { Plus } from "@gravity-ui/icons";
 import { HiOutlineUpload } from "react-icons/hi";
-import { imageUpload } from "@/lib/imgUpload"; 
-import { addPrompt } from "@/lib/action/prompts"; 
+import { imageUpload } from "@/lib/imgUpload";
+import { addPrompt } from "@/lib/action/prompts";
 import toast from "react-hot-toast";
 import { authClient } from "@/lib/auth-client";
 
 export default function AddPromptForm({ totalExistingPrompts }) {
   const [loading, setLoading] = useState(false);
-  const [imagePreview, setImagePreview] = useState(null); 
-  const fileInputRef = useRef(null); 
-  const isFreeLimitReached = totalExistingPrompts >= 3; 
+  const [imagePreview, setImagePreview] = useState(null);
+  const fileInputRef = useRef(null);
+  const isFreeLimitReached = totalExistingPrompts >= 3;
 
-  const { data: session } = authClient.useSession(); 
-  const userEmail = session?.user?.email;       
+  const { data: session } = authClient.useSession();
+  const userEmail = session?.user?.email;
 
   const handleUploadClick = () => {
     fileInputRef.current.click();
@@ -36,25 +36,21 @@ export default function AddPromptForm({ totalExistingPrompts }) {
     }
   };
 
- 
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (isFreeLimitReached) return;
-    
+
     setLoading(true);
     try {
-     
       const formData = new FormData(e.target);
       const data = Object.fromEntries(formData.entries());
-      
-     
+
       let uploadedImageUrl = "";
       if (data.image && data.image.size > 0) {
         const imageRes = await imageUpload(data.image);
-        uploadedImageUrl = imageRes.url; 
+        uploadedImageUrl = imageRes.url;
       }
-      
-     
+
       const promptProduct = {
         title: data.title,
         description: data.description,
@@ -64,21 +60,20 @@ export default function AddPromptForm({ totalExistingPrompts }) {
         tags: data.tags,
         difficultyLevel: data.difficultyLevel,
         visibility: data.visibility,
-        thumbnail: uploadedImageUrl, 
-        copyCount: 0,               
-        status: "pending", 
-        email: userEmail,          
+        usageInstructions: data.usageInstructions, 
+        thumbnail: uploadedImageUrl,
+        copyCount: 0,
+        status: "pending",
+        email: userEmail,
       };
 
-      
       const result = await addPrompt(promptProduct);
-      
+
       if (result.acknowledged) {
         toast.success("Prompt submitted successfully!");
-        e.target.reset(); 
+        e.target.reset();
         setImagePreview(null);
       }
-
     } catch (error) {
       console.error("Submission failed:", error);
       toast.error("Something went wrong. Please try again.");
@@ -109,16 +104,16 @@ export default function AddPromptForm({ totalExistingPrompts }) {
       </div>
 
       <form onSubmit={handleSubmit} className="flex flex-col gap-5">
-        
+
         {/* Title */}
         <div className="flex flex-col gap-1.5">
           <label className="text-xs font-medium text-zinc-400 uppercase tracking-wider">
             Prompt Title <span className="text-orange-400">*</span>
           </label>
-          <input 
-            type="text" 
-            name="title" 
-            placeholder="Enter prompt title" 
+          <input
+            type="text"
+            name="title"
+            placeholder="Enter prompt title"
             className="w-full bg-[#0b0813]/50 border border-purple-950/40 rounded-xl px-4 py-3 text-sm text-white placeholder-zinc-600 focus:outline-none focus:border-purple-500/50 transition-colors"
             required
           />
@@ -129,9 +124,9 @@ export default function AddPromptForm({ totalExistingPrompts }) {
           <label className="text-xs font-medium text-zinc-400 uppercase tracking-wider">
             Prompt Description <span className="text-orange-400">*</span>
           </label>
-          <textarea 
-            name="description" 
-            placeholder="Briefly describe what this prompt does" 
+          <textarea
+            name="description"
+            placeholder="Briefly describe what this prompt does"
             rows={3}
             className="w-full bg-[#0b0813]/50 border border-purple-950/40 rounded-xl px-4 py-3 text-sm text-white placeholder-zinc-600 focus:outline-none focus:border-purple-500/50 transition-colors resize-none"
             required
@@ -143,9 +138,9 @@ export default function AddPromptForm({ totalExistingPrompts }) {
           <label className="text-xs font-medium text-zinc-400 uppercase tracking-wider">
             Prompt Content <span className="text-orange-400">*</span>
           </label>
-          <textarea 
-            name="content" 
-            placeholder="Paste the actual prompt code/text here" 
+          <textarea
+            name="content"
+            placeholder="Paste the actual prompt code/text here"
             rows={5}
             className="w-full bg-[#0b0813]/50 border border-purple-950/40 rounded-xl px-4 py-3 text-sm font-mono text-white placeholder-zinc-600 focus:outline-none focus:border-purple-500/50 transition-colors resize-none"
             required
@@ -158,8 +153,8 @@ export default function AddPromptForm({ totalExistingPrompts }) {
             <label className="text-xs font-medium text-zinc-400 uppercase tracking-wider">
               Category <span className="text-orange-400">*</span>
             </label>
-            <select 
-              name="category" 
+            <select
+              name="category"
               className="w-full bg-[#0b0813]/80 border border-purple-950/40 rounded-xl px-4 py-3 text-sm text-zinc-300 focus:outline-none focus:border-purple-500/50 transition-colors"
               required
             >
@@ -167,8 +162,6 @@ export default function AddPromptForm({ totalExistingPrompts }) {
               <option value="marketing" className="bg-[#13112b]">Marketing</option>
               <option value="coding" className="bg-[#13112b]">Coding</option>
               <option value="writing" className="bg-[#13112b]">Creative Writing</option>
-              <option value="aiartdesign" className="bg-[#13112b]">AI Art & Design</option>
-             
               <option value="graphics-image" className="bg-[#13112b]">Graphics & Image</option>
             </select>
           </div>
@@ -177,8 +170,8 @@ export default function AddPromptForm({ totalExistingPrompts }) {
             <label className="text-xs font-medium text-zinc-400 uppercase tracking-wider">
               AI Engine <span className="text-orange-400">*</span>
             </label>
-            <select 
-              name="aiTool" 
+            <select
+              name="aiTool"
               className="w-full bg-[#0b0813]/80 border border-purple-950/40 rounded-xl px-4 py-3 text-sm text-zinc-300 focus:outline-none focus:border-purple-500/50 transition-colors"
               required
             >
@@ -197,8 +190,8 @@ export default function AddPromptForm({ totalExistingPrompts }) {
             <label className="text-xs font-medium text-zinc-400 uppercase tracking-wider">
               Difficulty Level <span className="text-orange-400">*</span>
             </label>
-            <select 
-              name="difficultyLevel" 
+            <select
+              name="difficultyLevel"
               className="w-full bg-[#0b0813]/80 border border-purple-950/40 rounded-xl px-4 py-3 text-sm text-zinc-300 focus:outline-none focus:border-purple-500/50 transition-colors"
               required
             >
@@ -244,11 +237,24 @@ export default function AddPromptForm({ totalExistingPrompts }) {
           <label className="text-xs font-medium text-zinc-400 uppercase tracking-wider">
             Tags (Comma-Separated)
           </label>
-          <input 
-            type="text" 
-            name="tags" 
-            placeholder="e.g. tailwind, card, component, responsive" 
+          <input
+            type="text"
+            name="tags"
+            placeholder="e.g. tailwind, card, component, responsive"
             className="w-full bg-[#0b0813]/50 border border-purple-950/40 rounded-xl px-4 py-3 text-sm text-white placeholder-zinc-600 focus:outline-none focus:border-purple-500/50 transition-colors"
+          />
+        </div>
+
+        {/* 🎯 Usage Instructions — নতুন field */}
+        <div className="flex flex-col gap-1.5">
+          <label className="text-xs font-medium text-zinc-400 uppercase tracking-wider">
+            Usage Instructions
+          </label>
+          <textarea
+            name="usageInstructions"
+            placeholder="Explain how to use this prompt — e.g. replace [topic] with your subject, run in ChatGPT-4..."
+            rows={3}
+            className="w-full bg-[#0b0813]/50 border border-purple-950/40 rounded-xl px-4 py-3 text-sm text-white placeholder-zinc-600 focus:outline-none focus:border-purple-500/50 transition-colors resize-none"
           />
         </div>
 
@@ -257,17 +263,17 @@ export default function AddPromptForm({ totalExistingPrompts }) {
           <label className="text-xs font-medium text-zinc-400 uppercase tracking-wider">
             Thumbnail Image Upload
           </label>
-          <input 
-            type="file" 
-            name="image" 
-            ref={fileInputRef} 
-            onChange={handleFileChange} 
-            accept="image/*" 
-            className="hidden" 
+          <input
+            type="file"
+            name="image"
+            ref={fileInputRef}
+            onChange={handleFileChange}
+            accept="image/*"
+            className="hidden"
             required
           />
 
-          <div 
+          <div
             onClick={handleUploadClick}
             className="border-2 border-dashed border-purple-950/40 rounded-xl p-5 text-center hover:border-purple-500/40 transition-colors cursor-pointer bg-[#0b0813]/30 overflow-hidden flex flex-col items-center justify-center min-h-[140px]"
           >
@@ -293,9 +299,9 @@ export default function AddPromptForm({ totalExistingPrompts }) {
         </div>
 
         {/* Submit button */}
-        <Button 
-          type="submit" 
-          isLoading={loading} 
+        <Button
+          type="submit"
+          isLoading={loading}
           className="w-full bg-gradient-to-r from-orange-500 to-amber-500 font-bold text-white rounded-xl py-6 mt-2 shadow-[0_0_20px_rgba(249,115,22,0.2)]"
         >
           Submit Prompt for Review

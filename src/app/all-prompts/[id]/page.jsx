@@ -1,5 +1,6 @@
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
+import { redirect } from "next/navigation";
 import { getPromptById, getPromptReviews, checkBookmarkStatus } from "@/lib/api/prompts";
 import PromptDetailClient from "@/components/prompts/PromptDetailClient";
 
@@ -8,6 +9,11 @@ export default async function PromptDetailPage({ params }) {
 
   const session = await auth.api.getSession({ headers: await headers() });
   const user = session?.user;
+
+  
+  if (!user) {
+    redirect("/auth/login");
+  }
 
   const prompt = await getPromptById(id);
 

@@ -26,7 +26,7 @@ export default async function DashboardSidebar() {
   const user = session?.user;
   const role = user?.role || "user";
 
-  const daashboardItems = {
+  const dashboardItems = {
     user: [
       { icon: Person, label: "My Profile", link: "/dashboard/user/profile" },
       { icon: Plus, label: "Add Prompt", link: "/dashboard/user/add-prompt" },
@@ -49,7 +49,7 @@ export default async function DashboardSidebar() {
     ],
   };
 
-  const navItems = daashboardItems[role];
+  const navItems = dashboardItems[role] || dashboardItems["user"];
 
   return (
     <Drawer>
@@ -59,7 +59,7 @@ export default async function DashboardSidebar() {
       </Button>
 
       <nav className="flex flex-col gap-1 w-[260px] h-screen border-r border-purple-950/20 bg-[#0b0813] p-4 font-sans shrink-0 justify-between">
-
+        
         {/* Top Content (Logo, Profile Preview, Nav Items) */}
         <div className="flex flex-col gap-1">
           {/* Brand Logo */}
@@ -78,9 +78,18 @@ export default async function DashboardSidebar() {
                 </svg>
               </div>
 
-              <span className="text-2xl font-black tracking-tight text-white">
-                AI<span className="bg-gradient-to-r from-orange-400 via-amber-400 to-yellow-300 bg-clip-text text-transparent drop-shadow-[0_0_12px_rgba(251,146,60,0.2)]">Core</span>
-              </span>
+              {/* premium badge  */}
+              <div className="flex items-center">
+                <span className="text-2xl font-black tracking-tight text-white">
+                  AI<span className="bg-gradient-to-r from-orange-400 via-amber-400 to-yellow-300 bg-clip-text text-transparent drop-shadow-[0_0_12px_rgba(251,146,60,0.2)]">Core</span>
+                </span>
+
+                {user?.plan === "premium" && (
+                  <span className="text-[10px] uppercase font-bold tracking-wider bg-cyan-500/20 text-cyan-400 px-2 py-0.5 rounded-md border border-cyan-500/30 ml-2 shrink-0">
+                    PRO
+                  </span>
+                )}
+              </div>
             </Link>
 
             {/* User Preview Card */}
@@ -89,8 +98,19 @@ export default async function DashboardSidebar() {
                 <Avatar.Image referrerPolicy="no-referrer" alt={user?.name} src={user?.image} />
                 <Avatar.Fallback>{user?.name?.charAt(0) || "U"}</Avatar.Fallback>
               </Avatar>
-              <div>
-                <p className="text-sm font-semibold text-white truncate max-w-[140px]">{user?.name || "User"}</p>
+              
+              {/* user pro badge */}
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-1.5 max-w-full">
+                  <p className="text-sm font-semibold text-white truncate max-w-[110px]">
+                    {user?.name || "User"}
+                  </p>
+                  {user?.plan === "premium" && (
+                    <span className="text-[9px] font-extrabold bg-cyan-500/20 text-cyan-400 px-1.5 py-0.5 rounded-md border border-cyan-500/20 tracking-wider shrink-0">
+                      PRO
+                    </span>
+                  )}
+                </div>
                 <p className="text-[10px] text-zinc-500 uppercase tracking-wider font-bold">{role}</p>
               </div>
             </div>

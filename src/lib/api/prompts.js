@@ -12,6 +12,7 @@ export const getMyPrompts = async (email) => {
   const res = await fetch(`${baseURl}/user/prompts?email=${email}`, {
     method: "GET",
     headers: { "Content-Type": "application/json" },
+    cache: "no-store", 
   });
   return await res.json();
 };
@@ -46,5 +47,17 @@ export const getPromptReviews = async (promptId) => {
 export const checkBookmarkStatus = async (email, promptId) => {
   if (!email) return { bookmarked: false };
   const res = await fetch(`${baseURl}/bookmarks/status?email=${email}&promptId=${promptId}`);
+  return await res.json();
+};
+
+export const getUserBookmarks = async (email) => {
+  if (!email) return { data: [] };
+  const res = await fetch(`${baseURl}/bookmarks?email=${email}`);
+  return await res.json();
+};
+
+export const getUserReviews = async (email) => {
+  if (!email) return { data: [] };
+  const res = await fetch(`${baseURl}/reviews?email=${email}`);
   return await res.json();
 };

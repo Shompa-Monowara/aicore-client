@@ -1,8 +1,16 @@
+import { auth } from "@/lib/auth";
+import { headers } from "next/headers";
+import { getUserBookmarks } from "@/lib/api/prompts";
+import SavedPromptsList from "@/components/dashboard/user/SavedPromptsList";
 import Link from "next/link";
 import { Bookmark } from "@gravity-ui/icons";
 
 export default async function SavedPromptsPage() {
-  const savedPrompts = [];
+  const session = await auth.api.getSession({ headers: await headers() });
+  const email = session?.user?.email;
+
+  const bookmarksData = await getUserBookmarks(email);
+  const savedPrompts = bookmarksData?.data || [];
 
   return (
     <div className="max-w-7xl mx-auto">
@@ -32,7 +40,7 @@ export default async function SavedPromptsPage() {
             </Link>
           </div>
         ) : (
-          <div />
+          <SavedPromptsList prompts={savedPrompts} email={email} />
         )}
       </div>
     </div>

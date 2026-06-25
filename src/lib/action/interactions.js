@@ -2,8 +2,13 @@
 
 const baseURl = process.env.NEXT_PUBLIC_SERVER_URL;
 
-export const incrementCopyCount = async (id) => {
-  const res = await fetch(`${baseURl}/prompts/${id}/copy`, { method: "PATCH" });
+{/* নতুন */}
+export const incrementCopyCount = async (id, email) => {
+  const res = await fetch(`${baseURl}/prompts/${id}/copy`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ email }),
+  });
   const data = await res.json();
   return data;
 };

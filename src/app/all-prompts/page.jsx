@@ -8,7 +8,6 @@ import PromptFilters from "@/components/prompts/PromptFilters";
 import PromptCard from "@/components/prompts/PromptCard";
 import { SORT_OPTIONS } from "@/lib/action/promptActions";
 
-// মেন্টরের পেজ নাম্বার জেনারেট করার ফর্মুলা
 const getPageNumbers = (page, totalPages) => {
   const pages = [];
   pages.push(1);
@@ -82,9 +81,9 @@ export default function AllPromptsPage() {
     loadPrompts();
   }, [loadPrompts]);
 
-  useEffect(() => {
-    setPage(1);
-  }, [search, category, aiTool, difficulty, sort]);
+  // useEffect(() => {
+  //   setPage(1);
+  // }, [search, category, aiTool, difficulty, sort]);
 
   const handleViewDetails = (id) => {
     if (!id) return;
@@ -102,7 +101,7 @@ export default function AllPromptsPage() {
     setAiTool("");
     setDifficulty("");
     setSort("latest");
-    // ইউআরএল থেকে সার্চ কুয়েরি ক্লিন করার জন্য
+   //url serach query
     router.push("/all-prompts");
   };
 

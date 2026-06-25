@@ -9,7 +9,7 @@ function FilterGroup({ title, items, selected, onSelect }) {
         {title}
       </p>
       <div className="flex flex-col gap-1">
-        {/* "All" বাটন - মেন্টরের মতো অ্যাক্টিভ স্টাইল যোগ করা হয়েছে */}
+     
         <button
           onClick={() => onSelect("")}
           className={`text-left px-3 py-2 rounded-lg text-sm transition-all border ${
@@ -21,7 +21,7 @@ function FilterGroup({ title, items, selected, onSelect }) {
           All
         </button>
         
-        {/* অন্যান্য ডাইনামিক বাটনগুলো */}
+      
         {items.map((item) => (
           <button
             key={item}

@@ -2,7 +2,7 @@ import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
 import Link from "next/link";
 import { Avatar } from "@heroui/react";
-import { getMyPrompts } from "@/lib/api/prompts"; // 🎯 নতুন import
+import { getMyPrompts } from "@/lib/api/prompts"; 
 import {
   HiOutlineMail,
   HiOutlineDocumentText,
@@ -10,6 +10,8 @@ import {
   HiOutlineXCircle,
   HiOutlineSparkles,
 } from "react-icons/hi";
+
+export const dynamic = "force-dynamic";
 
 export default async function ProfilePage() {
   const session = await auth.api.getSession({
