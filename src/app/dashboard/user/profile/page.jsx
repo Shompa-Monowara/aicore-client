@@ -9,6 +9,7 @@ import {
   HiOutlineCheckCircle,
   HiOutlineXCircle,
   HiOutlineSparkles,
+  HiBadgeCheck,
 } from "react-icons/hi";
 
 export const dynamic = "force-dynamic";
@@ -25,6 +26,8 @@ export default async function ProfilePage() {
  
   const promptsData = await getMyPrompts(user?.email);
   const promptsPublished = promptsData?.totalData || 0;
+
+  const isPremium = plan === "premium" || plan === "PRO LIFETIME";
 
   return (
     <div className="max-w-7xl mx-auto">
@@ -45,21 +48,44 @@ export default async function ProfilePage() {
           </Avatar>
 
           <div className="flex flex-col gap-1.5">
-            <p className="text-xl font-bold text-white">{user?.name || "User"}</p>
+            <div className="flex items-center gap-2">
+              <p className="text-xl font-bold text-white">
+                {role === 'admin' ? "Admin" : role === 'creator' ? "Creator" : role === 'user' ? "User" : user?.name}
+              </p>
+              {isPremium && (
+                <span className="flex items-center gap-0.5 px-2 py-0.5 rounded-full text-[10px] font-bold text-cyan-400 bg-cyan-400/10 border border-cyan-400/20">
+                  <HiBadgeCheck /> PRO
+                </span>
+              )}
+            </div>
+            
             <div className="flex items-center gap-1.5 text-zinc-400 text-sm">
               <HiOutlineMail className="text-base" />
               <span>{user?.email}</span>
             </div>
+            
             <div className="flex items-center gap-2 mt-1">
               <span className="px-3 py-1 rounded-full text-[11px] font-bold uppercase tracking-wide bg-purple-500/15 text-purple-300 border border-purple-500/30">
                 Role: {role}
               </span>
               <span className="px-3 py-1 rounded-full text-[11px] font-bold uppercase tracking-wide bg-amber-500/15 text-amber-300 border border-amber-500/30">
-                Plan: {plan}
+                Plan: {isPremium ? "PRO LIFETIME" : "Free"}
               </span>
             </div>
           </div>
         </div>
+
+        {isPremium && (
+          <div className="mt-5 flex items-center gap-3 bg-emerald-500/10 border border-emerald-500/20 rounded-xl p-4 text-emerald-400">
+            <HiOutlineCheckCircle className="text-xl shrink-0" />
+            <div>
+              <p className="font-bold">Lifetime Premium Active</p>
+              <p className="text-sm text-emerald-400/80">
+                Enjoy complete access to all Prompt Marketplace items!
+              </p>
+            </div>
+          </div>
+        )}
 
         <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="bg-zinc-900/40 border border-purple-950/20 rounded-xl p-5">
@@ -70,7 +96,6 @@ export default async function ProfilePage() {
             <p className="text-2xl font-bold text-white mt-1">{promptsPublished}</p>
           </div>
 
-          {/*  Conditional Account Status */}
           <div className="bg-zinc-900/40 border border-purple-950/20 rounded-xl p-5">
             {isVerified ? (
               <>
@@ -92,7 +117,7 @@ export default async function ProfilePage() {
           </div>
         </div>
 
-        {plan === "free" && (
+        {!isPremium && (
           <div className="mt-5 flex flex-col sm:flex-row items-center justify-between gap-4 bg-gradient-to-r from-purple-900/30 to-blue-900/20 border border-purple-500/20 rounded-xl p-5">
             <div className="flex items-start gap-3">
               <HiOutlineSparkles className="text-xl text-purple-300 mt-0.5 shrink-0" />

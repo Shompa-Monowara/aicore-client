@@ -60,31 +60,21 @@ export default async function DashboardSidebar() {
 
       <nav className="flex flex-col gap-1 w-[260px] h-screen border-r border-purple-950/20 bg-[#0b0813] p-4 font-sans shrink-0 justify-between">
         
-        {/* Top Content (Logo, Profile Preview, Nav Items) */}
         <div className="flex flex-col gap-1">
-          {/* Brand Logo */}
           <div className="pb-5 mb-4 pt-2 px-2">
             <Link href="/" className="flex items-center gap-2.5 cursor-pointer group">
               <div className="relative flex items-center justify-center transition-transform duration-300 group-hover:scale-105">
-                <svg
-                  className="h-7 w-7 text-orange-500 drop-shadow-[0_0_8px_rgba(249,115,22,0.5)]"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2.5"
-                >
+                <svg className="h-7 w-7 text-orange-500 drop-shadow-[0_0_8px_rgba(249,115,22,0.5)]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M9.813 15.904L9 21L7.188 15.904L2 15L7.188 14.096L9 9L9.813 14.096L15 15L9.813 15.904Z" />
                   <path strokeLinecap="round" strokeLinejoin="round" d="M19.071 4.929a10 10 0 00-14.142 0M19.071 4.929a10 10 0 010 14.142" />
                 </svg>
               </div>
 
-              {/* premium badge  */}
               <div className="flex items-center">
                 <span className="text-2xl font-black tracking-tight text-white">
                   AI<span className="bg-gradient-to-r from-orange-400 via-amber-400 to-yellow-300 bg-clip-text text-transparent drop-shadow-[0_0_12px_rgba(251,146,60,0.2)]">Core</span>
                 </span>
-
-                {user?.plan === "premium" && (
+                {(user?.plan === "premium" || user?.plan === "PRO LIFETIME") && (
                   <span className="text-[10px] uppercase font-bold tracking-wider bg-cyan-500/20 text-cyan-400 px-2 py-0.5 rounded-md border border-cyan-500/30 ml-2 shrink-0">
                     PRO
                   </span>
@@ -92,20 +82,18 @@ export default async function DashboardSidebar() {
               </div>
             </Link>
 
-            {/* User Preview Card */}
             <div className="mt-5 flex items-center gap-3 p-3 rounded-xl bg-zinc-900/30 border border-purple-950/20">
               <Avatar size="sm" className="border border-purple-500/20 shrink-0">
                 <Avatar.Image referrerPolicy="no-referrer" alt={user?.name} src={user?.image} />
                 <Avatar.Fallback>{user?.name?.charAt(0) || "U"}</Avatar.Fallback>
               </Avatar>
               
-              {/* user pro badge */}
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-1.5 max-w-full">
                   <p className="text-sm font-semibold text-white truncate max-w-[110px]">
-                    {user?.name || "User"}
+                    {user?.role === 'admin' ? "Admin" : user?.role === 'creator' ? "Creator" : "User"}
                   </p>
-                  {user?.plan === "premium" && (
+                  {(user?.plan === "premium" || user?.plan === "PRO LIFETIME") && (
                     <span className="text-[9px] font-extrabold bg-cyan-500/20 text-cyan-400 px-1.5 py-0.5 rounded-md border border-cyan-500/20 tracking-wider shrink-0">
                       PRO
                     </span>
@@ -116,7 +104,6 @@ export default async function DashboardSidebar() {
             </div>
           </div>
 
-          {/* Sidebar Nav Items */}
           <div className="flex flex-col gap-1.5">
             {navItems.map((item) => (
               <DashboardNavItem key={item.label} link={item.link} label={item.label}>
@@ -126,11 +113,9 @@ export default async function DashboardSidebar() {
           </div>
         </div>
 
-        {/* Bottom Logout Button */}
         <div className="pt-4 border-t border-purple-950/20">
           <DashboardLogoutButton />
         </div>
-
       </nav>
     </Drawer>
   );

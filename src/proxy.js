@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { headers } from "next/headers";
 import { auth } from "@/lib/auth";
 
-// 🎯 এটি Next.js এর নতুন ভার্সন অনুযায়ী একদম পারফেক্ট 'proxy' এক্সপোর্ট মেথড
+
 export async function proxy(request) {
   const session = await auth.api.getSession({
     headers: await headers(),

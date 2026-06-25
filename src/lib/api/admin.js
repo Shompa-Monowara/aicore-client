@@ -38,3 +38,12 @@ export const getReportedPrompts = async () => {
   const data = await res.json();
   return data;
 };
+
+export const getAllPayments = async () => {
+  const res = await fetch(`${baseURl}/admin/payments`, {
+    method: "GET",
+    headers: { "Content-Type": "application/json" },
+  });
+  const data = await res.json();
+  return data;
+};
