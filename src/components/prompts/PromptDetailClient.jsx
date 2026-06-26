@@ -40,7 +40,6 @@ export default function PromptDetailClient({
   const searchParams = useSearchParams();
   const paymentStatus = searchParams.get("payment");
   
-  // 🎯 Better Auth রিয়েল-টাইম সেশন
   const { data: session } = authClient.useSession();
   const liveUser = session?.user || initialUser; 
 
@@ -61,7 +60,6 @@ export default function PromptDetailClient({
   const [reportDetails, setReportDetails] = useState("");
   const [reportLoading, setReportLoading] = useState(false);
 
-  //fixed check for premium access based on usser role and plan
   const isPremiumUser =
     liveUser?.role === "admin" || (liveUser?.plan && liveUser.plan.toLowerCase() !== "free");
 
@@ -74,7 +72,6 @@ export default function PromptDetailClient({
      promptDifficulty === "pro" || 
      promptDifficulty === "premium") && !isPremiumUser;
 
-  // payement success then unlock
   useEffect(() => {
     if (paymentStatus === "success") {
       toast.success("🎉 Payment Successful! Unlocking premium prompt...");
@@ -100,6 +97,7 @@ export default function PromptDetailClient({
     }
   };
 
+  // 🎯 এখানে আপনার নতুন কাউন্ট ট্র্যাকিং এবং রিফ্রেশ সহ ফাংশনটি রিপ্লেস করা হলো
   const handleCopy = async () => {
     if (!liveUser) return requireLogin();
     if (isLocked) {
@@ -114,8 +112,15 @@ export default function PromptDetailClient({
         return;
       }
       await navigator.clipboard.writeText(prompt.content);
-      setCopyCount((prev) => prev + 1);
+      
+      if (result && typeof result.copyCount === "number") {
+        setCopyCount(result.copyCount);
+      } else {
+        setCopyCount((prev) => prev + 1);
+      }
+      
       toast.success("Prompt copied to clipboard!");
+      router.refresh(); 
     } catch (error) {
       console.error(error);
       toast.error("Could not copy prompt.");
@@ -319,7 +324,7 @@ export default function PromptDetailClient({
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
 
-                {/* Submit Form (🎯 ফ্লেক্স মিডল অ্যালাইনমেন্ট এবং ইনস্ট্যান্ট টোস্ট নোটিফিকেশন সহ) */}
+                {/* Submit Form */}
                 <div className="bg-[#090814] border border-purple-950/20 rounded-xl p-4 flex flex-col justify-center h-full min-h-[220px]">
                   {isLocked ? (
                     <div className="flex flex-col items-center text-center gap-2 py-4">

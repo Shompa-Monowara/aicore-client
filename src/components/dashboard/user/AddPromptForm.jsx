@@ -8,14 +8,17 @@ import { addPrompt } from "@/lib/action/prompts";
 import toast from "react-hot-toast";
 import { authClient } from "@/lib/auth-client";
 
-export default function AddPromptForm({ totalExistingPrompts }) {
+export default function AddPromptForm({ totalExistingPrompts, role = "user" }) {
   const [loading, setLoading] = useState(false);
   const [imagePreview, setImagePreview] = useState(null);
   const fileInputRef = useRef(null);
-  const isFreeLimitReached = totalExistingPrompts >= 3;
+  
+  // মেন্টরের নির্দেশ অনুযায়ী ক্রিয়েটরদের জন্য কোনো সাবমিশন লিমিট থাকবে না (সম্পূর্ণ ফ্রি)
+  const isFreeLimitReached = role === "user" && totalExistingPrompts >= 3;
 
   const { data: session } = authClient.useSession();
   const userEmail = session?.user?.email;
+  const userName = session?.user?.name;
 
   const handleUploadClick = () => {
     fileInputRef.current.click();
@@ -56,7 +59,7 @@ export default function AddPromptForm({ totalExistingPrompts }) {
         content: data.content,
         category: data.category,
         aiTool: data.aiTool,
-        tags: data.tags ? data.tags.split(",").map(tag => tag.trim()) : [], // ট্যাগগুলোকে অ্যারেতে কনভার্ট করা হলো
+        tags: data.tags ? data.tags.split(",").map(tag => tag.trim()) : [],
         difficultyLevel: data.difficultyLevel,
         visibility: data.visibility,
         usageInstructions: data.usageInstructions, 
@@ -64,6 +67,8 @@ export default function AddPromptForm({ totalExistingPrompts }) {
         copyCount: 0,
         status: "pending",
         email: userEmail,
+        creatorName: userName, // ডাইনামিক ইমেইল ও নাম পাঠানো নিশ্চিত করা হলো
+        creatorRole: role
       };
 
       const result = await addPrompt(promptProduct);
@@ -83,7 +88,7 @@ export default function AddPromptForm({ totalExistingPrompts }) {
 
   if (isFreeLimitReached) {
     return (
-      <div className="w-full max-w-2xl ml-0 p-8 rounded-2xl bg-amber-500/10 border border-amber-500/20 text-center backdrop-blur-md">
+      <div className="w-full p-8 rounded-2xl bg-amber-500/10 border border-amber-500/20 text-center backdrop-blur-md">
         <h2 className="text-xl font-bold text-amber-400 mb-2">Prompt Limit Reached!</h2>
         <p className="text-zinc-400 text-sm mb-6">
           Free users can add only up to 3 prompts. Upgrade your account to premium to unlock unlimited prompt submissions.
@@ -96,17 +101,16 @@ export default function AddPromptForm({ totalExistingPrompts }) {
   }
 
   return (
-    <div className="w-full max-w-4xl ml-4 md:ml-4 bg-[#0f0d26]/60 border border-purple-950/40 p-7 md:p-8 rounded-2xl backdrop-blur-md font-sans shadow-[0_4px_30px_rgba(0,0,0,0.3)]">
-      <div className="flex flex-col mb-6 border-b border-purple-950/30 pb-4">
+    // 🎯 এখানে padding, ml-0 এবং গ্লাস মরফিজম বর্ডার শেড ফিক্স করা হয়েছে (SaaS Vibe)
+    <div className="w-full bg-zinc-900/20 border border-purple-500/10 p-6 md:p-8 rounded-2xl backdrop-blur-xl font-sans shadow-[0_8px_32px_rgba(0,0,0,0.4)]">
+      <div className="flex flex-col mb-6 border-b border-purple-950/20 pb-4">
         <div className="flex items-center gap-2">
-          <Plus className="text-orange-400 size-6" />
-          <h1 className="text-xl font-bold text-white tracking-wide">Add New Prompt</h1>
+          <Plus className="text-orange-500 size-6 drop-shadow-[0_0_8px_rgba(249,115,22,0.4)]" />
+          <h1 className="text-xl font-bold text-white tracking-wide">Add New Prompt Template</h1>
         </div>
-        
       </div>
 
       <form onSubmit={handleSubmit} className="flex flex-col gap-5">
-
         {/* Title */}
         <div className="flex flex-col gap-1.5">
           <label className="text-xs font-semibold text-zinc-400 uppercase tracking-wider">
@@ -115,8 +119,8 @@ export default function AddPromptForm({ totalExistingPrompts }) {
           <input
             type="text"
             name="title"
-            placeholder="Enter prompt title"
-            className="w-full bg-[#070510]/60 border border-purple-950/50 rounded-xl px-4 py-3 text-sm text-white placeholder-zinc-600 focus:outline-none focus:border-purple-500/40 focus:shadow-[0_0_15px_rgba(168,85,247,0.15)] transition-all duration-300"
+            placeholder="e.g. Optimized React Tailwind Card Builder"
+            className="w-full bg-zinc-950/40 border border-purple-950/40 rounded-xl px-4 py-3 text-sm text-white placeholder-zinc-600 focus:outline-none focus:border-purple-500/40 transition-all duration-300"
             required
           />
         </div>
@@ -124,13 +128,13 @@ export default function AddPromptForm({ totalExistingPrompts }) {
         {/* Description */}
         <div className="flex flex-col gap-1.5">
           <label className="text-xs font-semibold text-zinc-400 uppercase tracking-wider">
-            Prompt Description <span className="text-orange-400">*</span>
+            Short Description <span className="text-orange-400">*</span>
           </label>
           <textarea
             name="description"
-            placeholder="Briefly describe what this prompt does"
-            rows={3}
-            className="w-full bg-[#070510]/60 border border-purple-950/50 rounded-xl px-4 py-3 text-sm text-white placeholder-zinc-600 focus:outline-none focus:border-purple-500/40 focus:shadow-[0_0_15px_rgba(168,85,247,0.15)] transition-all duration-300 resize-none"
+            placeholder="Explain what this prompt accomplishes in 1–2 sentences"
+            rows={2}
+            className="w-full bg-zinc-950/40 border border-purple-950/40 rounded-xl px-4 py-3 text-sm text-white placeholder-zinc-600 focus:outline-none focus:border-purple-500/40 transition-all duration-300 resize-none"
             required
           />
         </div>
@@ -138,13 +142,13 @@ export default function AddPromptForm({ totalExistingPrompts }) {
         {/* Content */}
         <div className="flex flex-col gap-1.5">
           <label className="text-xs font-semibold text-zinc-400 uppercase tracking-wider">
-            Prompt Content <span className="text-orange-400">*</span>
+            Prompt Content Template <span className="text-orange-400">*</span>
           </label>
           <textarea
             name="content"
-            placeholder="Paste the actual prompt code/text here"
+            placeholder="Write the full, detailed prompt instructions. Use brackets to indicate variables e.g., 'Act as a [role]...'"
             rows={5}
-            className="w-full bg-[#070510]/60 border border-purple-950/50 rounded-xl px-4 py-3 text-sm font-mono text-white placeholder-zinc-600 focus:outline-none focus:border-purple-500/40 focus:shadow-[0_0_15px_rgba(168,85,247,0.15)] transition-all duration-300 resize-none"
+            className="w-full bg-zinc-950/40 border border-purple-950/40 rounded-xl px-4 py-3 text-sm font-mono text-purple-200 placeholder-zinc-600 focus:outline-none focus:border-purple-500/40 transition-all duration-300 resize-none"
             required
           />
         </div>
@@ -155,21 +159,20 @@ export default function AddPromptForm({ totalExistingPrompts }) {
             <label className="text-xs font-semibold text-zinc-400 uppercase tracking-wider">
               Category <span className="text-orange-400">*</span>
             </label>
-           
             <select
               name="category"
               defaultValue=""
-              className="w-full bg-[#070510]/80 border border-purple-950/50 rounded-xl px-4 py-3 text-sm text-zinc-300 focus:outline-none focus:border-purple-500/40 transition-colors"
+              className="w-full bg-zinc-950/60 border border-purple-950/40 rounded-xl px-4 py-3 text-sm text-zinc-300 focus:outline-none focus:border-purple-500/40 transition-colors cursor-pointer"
               required
             >
               <option value="" disabled>Select Category</option>
-              <option value="marketing" className="bg-[#13112b]">Marketing</option>
-              <option value="coding" className="bg-[#13112b]">Coding</option>
-              <option value="writing" className="bg-[#13112b]">Creative Writing</option>
-              <option value="graphics-image" className="bg-[#13112b]">Graphics & Image</option>
-              <option value="Idea-generatiion" className="bg-[#13112b]">Idea Generation</option>
-              <option value="system-assistant" className="bg-[#13112b]">System Assistant</option>
-              <option value="other" className="bg-[#13112b]">Other</option>
+              <option value="Marketing" className="bg-[#0b0813]">Marketing</option>
+              <option value="Coding" className="bg-[#0b0813]">Coding</option>
+              <option value="Writing" className="bg-[#0b0813]">Creative Writing</option>
+              <option value="Graphics & Image" className="bg-[#0b0813]">Graphics & Image</option>
+              <option value="Idea Generation" className="bg-[#0b0813]">Idea Generation</option>
+              <option value="System Assistant" className="bg-[#0b0813]">System Assistant</option>
+              <option value="Other" className="bg-[#0b0813]">Other</option>
             </select>
           </div>
 
@@ -177,20 +180,19 @@ export default function AddPromptForm({ totalExistingPrompts }) {
             <label className="text-xs font-semibold text-zinc-400 uppercase tracking-wider">
               AI Engine <span className="text-orange-400">*</span>
             </label>
-           
             <select
               name="aiTool"
               defaultValue=""
-              className="w-full bg-[#070510]/80 border border-purple-950/50 rounded-xl px-4 py-3 text-sm text-zinc-300 focus:outline-none focus:border-purple-500/40 transition-colors"
+              className="w-full bg-zinc-950/60 border border-purple-950/40 rounded-xl px-4 py-3 text-sm text-zinc-300 focus:outline-none focus:border-purple-500/40 transition-colors cursor-pointer"
               required
             >
               <option value="" disabled>Select AI Tool</option>
-              <option value="chatgpt" className="bg-[#13112b]">ChatGPT</option>
-              <option value="claude" className="bg-[#13112b]">Claude</option>
-              <option value="midjourney" className="bg-[#13112b]">Midjourney</option>
-              <option value="gemini" className="bg-[#13112b]">Gemini</option>
-              <option value="stable-diffusion" className="bg-[#13112b]">Stable Diffusion</option>
-              <option value="other" className="bg-[#13112b]">Other</option>
+              <option value="ChatGPT" className="bg-[#0b0813]">ChatGPT</option>
+              <option value="Claude" className="bg-[#0b0813]">Claude</option>
+              <option value="Midjourney" className="bg-[#0b0813]">Midjourney</option>
+              <option value="Gemini" className="bg-[#0b0813]">Gemini</option>
+              <option value="Stable Diffusion" className="bg-[#0b0813]">Stable Diffusion</option>
+              <option value="Other" className="bg-[#0b0813]">Other</option>
             </select>
           </div>
         </div>
@@ -198,20 +200,19 @@ export default function AddPromptForm({ totalExistingPrompts }) {
         {/* Row 2: Difficulty Level & Visibility Status */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="flex flex-col gap-1.5">
-            <label className="text-xs font-medium text-zinc-400 uppercase tracking-wider">
+            <label className="text-xs font-semibold text-zinc-400 uppercase tracking-wider">
               Difficulty Level <span className="text-orange-400">*</span>
             </label>
-           
             <select
               name="difficultyLevel"
               defaultValue=""
-              className="w-full bg-[#070510]/80 border border-purple-950/50 rounded-xl px-4 py-3 text-sm text-zinc-300 focus:outline-none focus:border-purple-500/40 transition-colors"
+              className="w-full bg-zinc-950/60 border border-purple-950/40 rounded-xl px-4 py-3 text-sm text-zinc-300 focus:outline-none focus:border-purple-500/40 transition-colors cursor-pointer"
               required
             >
               <option value="" disabled>Select Level</option>
-              <option value="beginner" className="bg-[#13112b]">Beginner</option>
-              <option value="intermediate" className="bg-[#13112b]">Intermediate</option>
-              <option value="pro" className="bg-[#13112b]">Pro</option>
+              <option value="Beginner" className="bg-[#0b0813]">Beginner</option>
+              <option value="Intermediate" className="bg-[#0b0813]">Intermediate</option>
+              <option value="Pro" className="bg-[#0b0813]">Pro</option>
             </select>
           </div>
 
@@ -219,7 +220,7 @@ export default function AddPromptForm({ totalExistingPrompts }) {
             <label className="text-xs font-semibold text-zinc-400 uppercase tracking-wider">
               Visibility Status <span className="text-orange-400">*</span>
             </label>
-            <div className="flex flex-wrap items-center gap-5 h-[46px]">
+            <div className="flex items-center gap-6 h-[46px]">
               <label className="flex items-center gap-2 cursor-pointer text-sm text-zinc-300 select-none">
                 <input
                   type="radio"
@@ -254,24 +255,24 @@ export default function AddPromptForm({ totalExistingPrompts }) {
             type="text"
             name="tags"
             placeholder="e.g. tailwind, card, component, responsive"
-            className="w-full bg-[#070510]/60 border border-purple-950/50 rounded-xl px-4 py-3 text-sm text-white placeholder-zinc-600 focus:outline-none focus:border-purple-500/40 focus:shadow-[0_0_15px_rgba(168,85,247,0.15)] transition-all duration-300"
+            className="w-full bg-zinc-950/40 border border-purple-950/40 rounded-xl px-4 py-3 text-sm text-white placeholder-zinc-600 focus:outline-none focus:border-purple-500/40 transition-all duration-300"
           />
         </div>
 
-        {/* Usage Instructions field */}
+        {/* Usage Instructions */}
         <div className="flex flex-col gap-1.5">
           <label className="text-xs font-semibold text-zinc-400 uppercase tracking-wider">
             Usage Instructions
           </label>
           <textarea
             name="usageInstructions"
-            placeholder="Explain how to use this prompt — e.g. replace [topic] with your subject, run in ChatGPT-4..."
-            rows={3}
-            className="w-full bg-[#070510]/60 border border-purple-950/50 rounded-xl px-4 py-3 text-sm text-white placeholder-zinc-600 focus:outline-none focus:border-purple-500/40 focus:shadow-[0_0_15px_rgba(168,85,247,0.15)] transition-all duration-300 resize-none"
+            placeholder="Explain how to use this prompt — e.g. replace [product description] with your data..."
+            rows={2}
+            className="w-full bg-zinc-950/40 border border-purple-950/40 rounded-xl px-4 py-3 text-sm text-white placeholder-zinc-600 focus:outline-none focus:border-purple-500/40 transition-all duration-300 resize-none"
           />
         </div>
 
-        {/* Thumbnail Image upload */}
+        {/* Thumbnail Upload */}
         <div className="flex flex-col gap-2">
           <label className="text-xs font-semibold text-zinc-400 uppercase tracking-wider">
             Thumbnail Image Upload
@@ -287,24 +288,20 @@ export default function AddPromptForm({ totalExistingPrompts }) {
 
           <div
             onClick={handleUploadClick}
-            className="border-2 border-dashed border-purple-950/50 rounded-xl p-5 text-center hover:border-purple-500/40 transition-colors cursor-pointer bg-[#070510]/30 overflow-hidden flex flex-col items-center justify-center min-h-[140px]"
+            className="border-2 border-dashed border-purple-950/40 rounded-xl p-5 text-center hover:border-purple-500/30 transition-colors cursor-pointer bg-zinc-950/20 overflow-hidden flex flex-col items-center justify-center min-h-[140px]"
           >
             {imagePreview ? (
               <div className="relative w-full max-w-[200px] h-28 rounded-lg overflow-hidden border border-purple-950">
                 <img src={imagePreview} alt="Thumbnail Preview" className="w-full h-full object-cover" />
-                <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity">
-                  <p className="text-[10px] text-white font-semibold">Change Image</p>
+                <div className="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity">
+                  <p className="text-[11px] text-white font-medium">Change Image</p>
                 </div>
               </div>
             ) : (
               <>
-                <HiOutlineUpload className="text-2xl text-zinc-400 mb-2" />
-                <p className="text-sm font-bold text-white">
-                  Click to choose a thumbnail image file
-                </p>
-                <p className="text-xs text-zinc-500 mt-1">
-                  Supports PNG, JPG, or WEBP (Max 2MB)
-                </p>
+                <HiOutlineUpload className="text-2xl text-zinc-500 mb-2" />
+                <p className="text-sm font-bold text-zinc-300">Click to choose a thumbnail image file</p>
+                <p className="text-xs text-zinc-500 mt-1">Supports PNG, JPG, or WEBP (Max 5MB)</p>
               </>
             )}
           </div>
@@ -314,7 +311,7 @@ export default function AddPromptForm({ totalExistingPrompts }) {
         <Button
           type="submit"
           isLoading={loading}
-          className="w-full bg-gradient-to-r from-orange-500 to-amber-500 font-bold text-white rounded-xl py-6 mt-2 shadow-[0_0_20px_rgba(249,115,22,0.2)] transition-transform duration-300 hover:-translate-y-0.5"
+          className="w-full bg-gradient-to-r from-orange-500 to-amber-500 font-bold text-white rounded-xl py-6 mt-2 shadow-[0_4px_20px_rgba(249,115,22,0.2)] transition-transform duration-300 hover:-translate-y-0.5"
         >
           Submit Prompt for Review
         </Button>

@@ -48,7 +48,7 @@ export default function CreatorAnalyticsDashboard() {
     );
   }
 
-  // 🎯 Fallback/Demo Data Logic: ডাটাবেস খালি থাকলে মেন্টরের ডেমো ডেটা দেখাবে
+ 
   const hasRealData = analyticsData?.stats && analyticsData.stats.totalPrompts > 0;
 
   const stats = hasRealData 
@@ -112,7 +112,7 @@ export default function CreatorAnalyticsDashboard() {
         </div>
       </div>
 
-      {/* চার্ট সেকশন */}
+     
       <div className="flex flex-col gap-8">
         
         {/* ১. Bar Chart */}

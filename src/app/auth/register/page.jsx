@@ -16,30 +16,27 @@ import {
   Link,
 } from "@heroui/react";
 import { useRouter } from "next/navigation"; 
-import React from "react";
+import React, { useState } from "react";
 import { FcGoogle } from "react-icons/fc"; 
 import toast from "react-hot-toast";
 
 export default function SignUpPage() {
   const router = useRouter(); 
+const [role,setRole] = useState("user")
+const [plan,setPlan] = useState("free")
+console.log(role);
 
   const onSubmit = async (e) => {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
     const user = Object.fromEntries(formData.entries());
 
-    const { error } = await authClient.signUp.email({
-      email: user.email,
-      password: user.password,
-      name: user.name,
-      image: user.image || undefined,
-      
-      data: {
-        role: user.role || "user",
-        plan: "free",
-      }
+    const { error,data } = await authClient.signUp.email({
+     ...user,
+     role,
+     plan,
     });
-
+console.log(data);
     if (error) {
       toast.error(error.message || "Signup failed. Please try again.");
       return;
@@ -146,6 +143,8 @@ export default function SignUpPage() {
                   isRequired 
                   name="role" 
                   placeholder="Select one"
+                  onChange={(value) => setRole(value)}
+                  defaultValue={role}
                   variant="flat"
                   classNames={{
                     trigger: "bg-[#0f111a] border-transparent text-white hover:border-transparent data-[hover=true]:bg-[#0f111a] h-12 rounded-xl",
