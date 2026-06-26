@@ -2,7 +2,6 @@ import { NextResponse } from "next/server";
 import { headers } from "next/headers";
 import { auth } from "@/lib/auth";
 
-
 export async function proxy(request) {
   const session = await auth.api.getSession({
     headers: await headers(),
@@ -11,22 +10,27 @@ export async function proxy(request) {
   const { pathname } = request.nextUrl;
   const user = session?.user;
 
+  // ১. ইউজার লগইন না থাকলে লগইন পেজে পাঠান
   if (!user) {
     return NextResponse.redirect(new URL("/auth/login", request.url));
   }
 
-  const role = user.role;
-  const plan = user.plan?.toLowerCase();
+  const role = user.role?.toLowerCase() || "user";
+  const plan = user.plan?.toLowerCase() || "free";
 
-  // 🎯 ইতিমধ্যে premium হলে পেমেন্ট পেজে ঢুকতে না দিয়ে সরাসরি প্রোফাইল পেজে পাঠিয়ে দেওয়া সবচেয়ে নিরাপদ
+  // 🎯 ২. ইতিমধ্যে premium হলে পেমেন্ট পেজে ঢুকতে না দিয়ে রোল অনুযায়ী সঠিক প্রোফাইলে পাঠান
   if (pathname.startsWith("/payment") && plan === "premium") {
-    return NextResponse.redirect(new URL("/dashboard/user/profile", request.url));
+    // রোল অনুযায়ী ড্যাশবোর্ড ইউআরএল তৈরি করা হচ্ছে (যেমন: /dashboard/creator/profile বা /dashboard/user/profile)
+    const dashboardRoute = `/dashboard/${role}/profile`;
+    return NextResponse.redirect(new URL(dashboardRoute, request.url));
   }
 
+  // ৩. এডমিন ড্যাশবোর্ড প্রোটেকশন
   if (pathname.startsWith("/dashboard/admin") && role !== "admin") {
     return NextResponse.redirect(new URL("/unauthorized", request.url));
   }
 
+  // ৪. ক্রিয়েটর ড্যাশবোর্ড প্রোটেকশন
   if (
     pathname.startsWith("/dashboard/creator") &&
     role !== "creator" &&

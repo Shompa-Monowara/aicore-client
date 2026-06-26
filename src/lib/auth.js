@@ -25,7 +25,6 @@ export const auth = betterAuth({
   
   user: {
     additionalFields: {
-      
       role: {
         type: "string", 
         defaultValue: "user", 
@@ -37,13 +36,10 @@ export const auth = betterAuth({
     },
   },
 
-
+ 
   session: {
-    cookieCache: {
-      enabled: true,
-      strategy: "jwt",
-      maxAge: 60 * 24 * 60,
-    },
+    strategy: "jwt", 
   },
+  
   plugins: [jwt()],
 });

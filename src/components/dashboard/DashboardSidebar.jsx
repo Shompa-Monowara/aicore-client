@@ -35,7 +35,8 @@ export default async function DashboardSidebar() {
       { icon: Comment, label: "My Reviews", link: "/dashboard/user/my-reviews" },
     ],
     creator: [
-      { icon: ChartBar, label: "Creator Dashboard Home", link: "/dashboard/creator" },
+      { icon: Person, label: "My Profile", link: "/dashboard/creator/profile" },
+      { icon: ChartBar, label: "Creator Home", link: "/dashboard/creator/home" },
       { icon: Plus, label: "Add Prompt", link: "/dashboard/creator/add-prompt" },
       { icon: Folder, label: "My Prompts", link: "/dashboard/creator/my-prompts" },
     ],

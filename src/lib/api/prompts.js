@@ -61,3 +61,12 @@ export const getUserReviews = async (email) => {
   const res = await fetch(`${baseURl}/reviews?email=${email}`);
   return await res.json();
 };
+export const getCreatorAnalytics = async (email) => {
+  if (!email) return null;
+  const res = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/creator/analytics?email=${email}`, {
+    method: "GET",
+    headers: { "Content-Type": "application/json" },
+    cache: "no-store",
+  });
+  return await res.json();
+};

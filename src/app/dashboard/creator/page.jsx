@@ -1,11 +1,11 @@
 import React from 'react';
 
-const page = () => {
+const creatorHomepage = () => {
     return (
         <div>
-            creator
+            creator homepage
         </div>
     );
 };
 
-export default page;
+export default creatorHomepage;
