@@ -2,7 +2,8 @@ import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
 import Link from "next/link";
 import { Avatar } from "@heroui/react";
-import { getMyPrompts } from "@/lib/api/prompts"; 
+import { getMyPrompts } from "@/lib/api/prompts";
+import { getTokenServer } from "@/lib/getTokenServer";
 import {
   HiOutlineMail,
   HiOutlineDocumentText,
@@ -22,9 +23,10 @@ export default async function ProfilePage() {
   const user = session?.user;
   const role = user?.role || "user";
   const plan = user?.plan || "free";
-  const isVerified = user?.emailVerified; 
- 
-  const promptsData = await getMyPrompts(user?.email);
+  const isVerified = user?.emailVerified;
+
+  const token = await getTokenServer();
+  const promptsData = await getMyPrompts(user?.email, token);
   const promptsPublished = promptsData?.totalData || 0;
 
   const isPremium = plan === "premium" || plan === "PRO LIFETIME";

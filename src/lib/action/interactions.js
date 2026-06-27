@@ -6,8 +6,8 @@ import { getTokenServer } from "../getTokenServer";
 
 const baseURl = process.env.NEXT_PUBLIC_SERVER_URL;
 
-export const incrementCopyCount = async (id, email) => {
-  const token = await getTokenServer();
+export const incrementCopyCount = async (id, email, token) => {
+  // const token = await getTokenServer();
   const res = await fetch(`${baseURl}/prompts/${id}/copy`, {
     method: "PATCH",
     headers: {
@@ -19,8 +19,8 @@ export const incrementCopyCount = async (id, email) => {
   return await res.json();
 };
 
-export const toggleBookmark = async (email, promptId) => {
-  const token = await getTokenServer();
+export const toggleBookmark = async (email, promptId, token) => {
+
   const res = await fetch(`${baseURl}/bookmarks/toggle`, {
     method: "POST",
     headers: {

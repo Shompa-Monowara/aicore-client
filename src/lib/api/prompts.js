@@ -4,29 +4,14 @@ const baseURl = process.env.NEXT_PUBLIC_SERVER_URL;
 // USER & CREATOR PROMPT ROUTES
 // ==========================================
 
-export const getPrompts = async () => {
-  const res = await fetch(`${baseURl}/user/prompts`, {
-    method: "GET",
-    headers: { "Content-Type": "application/json" },
-  });
-  return await res.json();
-};
-
-export const getMyPrompts = async (email) => {
+export const getMyPrompts = async (email, token) => {
   const res = await fetch(`${baseURl}/user/prompts?email=${email}`, {
     method: "GET",
-    headers: { "Content-Type": "application/json" },
-    cache: "no-store", 
-  });
-  return await res.json();
-};
-
-export const getCreatorPrompts = async (email) => {
-  if (!email) return { data: [], totalData: 0 };
-  const res = await fetch(`${baseURl}/api/creator/prompts?email=${email}`, {
-    method: "GET",
-    headers: { "Content-Type": "application/json" },
-    cache: "no-store", 
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${token}`,
+    },
+    cache: "no-store",
   });
   return await res.json();
 };
@@ -72,25 +57,30 @@ export const checkBookmarkStatus = async (email, promptId) => {
   return await res.json();
 };
 
-export const getUserBookmarks = async (email) => {
+export const getUserBookmarks = async (email, token) => {
   if (!email) return { data: [] };
-  const res = await fetch(`${baseURl}/bookmarks?email=${email}`);
+  const res = await fetch(`${baseURl}/bookmarks?email=${email}`, {
+    headers: { "Authorization": `Bearer ${token}` },
+    cache: "no-store",
+  });
   return await res.json();
 };
 
-export const getUserReviews = async (email) => {
+export const getUserReviews = async (email, token) => {
   if (!email) return { data: [] };
-  const res = await fetch(`${baseURl}/reviews?email=${email}`);
+  const res = await fetch(`${baseURl}/reviews?email=${email}`, {
+    headers: { "Authorization": `Bearer ${token}` },
+    cache: "no-store",
+  });
   return await res.json();
 };
-
 
 export const getAllPublicReviews = async () => {
   try {
     const res = await fetch(`${baseURl}/reviews`, { cache: "no-store" });
     if (!res.ok) return [];
     const result = await res.json();
-    return result?.data || []; 
+    return result?.data || [];
   } catch (error) {
     console.error("Error fetching public reviews:", error);
     return [];
@@ -105,7 +95,7 @@ export const getCreatorAnalytics = async (email, token) => {
   if (!email) return null;
   const res = await fetch(`${baseURl}/api/creator/analytics?email=${email}`, {
     method: "GET",
-    headers: { 
+    headers: {
       "Content-Type": "application/json",
       "Authorization": `Bearer ${token}`,
     },
@@ -121,9 +111,9 @@ export const getCreatorAnalytics = async (email, token) => {
 export const getFeaturedPrompts = async () => {
   try {
     const res = await fetch(`${baseURl}/prompts/public?limit=6`, { cache: "no-store" });
-    if (!res.ok) return []; 
+    if (!res.ok) return [];
     const result = await res.json();
-    return result?.data || []; 
+    return result?.data || [];
   } catch (error) {
     console.error("Error inside getFeaturedPrompts:", error);
     return [];
@@ -132,15 +122,11 @@ export const getFeaturedPrompts = async () => {
 
 export const getTopCreators = async () => {
   try {
-    const res = await fetch(`${baseURl}/api/creators/top`, { 
-      cache: "no-store" 
-    });
-    
+    const res = await fetch(`${baseURl}/api/creators/top`, { cache: "no-store" });
     if (!res.ok) {
       console.error("Top Creators API response error:", res.status);
       return [];
     }
-    
     return await res.json();
   } catch (error) {
     console.error("Fetch failed inside getTopCreators:", error);

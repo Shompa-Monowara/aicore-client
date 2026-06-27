@@ -53,7 +53,7 @@ export default function CreatorAddPromptForm() {
         category: data.category,
         aiTool: data.aiTool,
         tags: data.tags ? data.tags.split(",").map(tag => tag.trim()) : [],
-        difficultyLevel: data.difficultyLevel,
+        difficulty: data.difficulty, // 🎯 ফিক্সড: difficultyLevel -> difficulty
         visibility: data.visibility,
         usageInstructions: data.usageInstructions,
         thumbnail: uploadedImageUrl,
@@ -65,9 +65,7 @@ export default function CreatorAddPromptForm() {
         creatorRole: "creator"
       };
 
-      const tokenRes = await authClient.token();
-      const token = tokenRes?.token;
-      const result = await addPrompt(promptProduct, token);
+      const result = await addPrompt(promptProduct);
 
       if (result.acknowledged) {
         toast.success("Creator prompt submitted successfully for review!");
@@ -133,7 +131,7 @@ export default function CreatorAddPromptForm() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
           <div className="flex flex-col gap-1.5">
             <label className="text-[10px] font-black text-purple-400 uppercase tracking-widest">Difficulty Level <span className="text-purple-400">*</span></label>
-            <select name="difficultyLevel" defaultValue="" className="w-full bg-zinc-950/60 border border-purple-950/40 rounded-xl px-4 py-3 text-sm text-zinc-300 focus:outline-none focus:border-purple-500/40 transition-colors cursor-pointer" required>
+            <select name="difficulty" defaultValue="" className="w-full bg-zinc-950/60 border border-purple-950/40 rounded-xl px-4 py-3 text-sm text-zinc-300 focus:outline-none focus:border-purple-500/40 transition-colors cursor-pointer" required>
               <option value="" disabled>Select Level</option>
               <option value="Beginner" className="bg-[#080810]">Beginner</option>
               <option value="Intermediate" className="bg-[#080810]">Intermediate</option>

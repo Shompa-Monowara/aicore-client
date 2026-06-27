@@ -19,7 +19,7 @@ export const getAllUsers = async (token) => {
     method: "GET",
     headers: { 
       "Content-Type": "application/json",
-      "Authorization": `Bearer ${token}` // 🎯 জিরো বাগ ফিক্সিং হেডার
+      "Authorization": `Bearer ${token}` 
     },
     cache: "no-store"
   });
@@ -32,7 +32,7 @@ export const getAllPrompts = async (token) => {
     method: "GET",
     headers: { 
       "Content-Type": "application/json",
-      "Authorization": `Bearer ${token}` // 🎯 জিরো বাগ ফিক্সিং হেডার
+      "Authorization": `Bearer ${token}` 
     },
     cache: "no-store"
   });
@@ -45,7 +45,7 @@ export const getReportedPrompts = async (token) => {
     method: "GET",
     headers: { 
       "Content-Type": "application/json",
-      "Authorization": `Bearer ${token}` // 🎯 জিরো বাগ ফিক্সিং হেডার
+      "Authorization": `Bearer ${token}` 
     },
     cache: "no-store"
   });
@@ -58,7 +58,7 @@ export const getAllPayments = async (token) => {
     method: "GET",
     headers: { 
       "Content-Type": "application/json",
-      "Authorization": `Bearer ${token}` // 🎯 জিরো বাগ ফিক্সিং হেডার
+      "Authorization": `Bearer ${token}` 
     },
     cache: "no-store"
   });

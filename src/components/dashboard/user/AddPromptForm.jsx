@@ -9,12 +9,11 @@ import { addPrompt } from "@/lib/action/prompts";
 import toast from "react-hot-toast";
 import { authClient } from "@/lib/auth-client";
 
-// 🎯 ১. প্রপ্স এর ভেতর পেরেন্ট পেজ থেকে পাঠানো 'token' রিসিভ করা হলো
-export default function UserAddPromptForm({ totalExistingPrompts, token }) {
+export default function AddPromptForm({ totalExistingPrompts }) {
   const [loading, setLoading] = useState(false);
   const [imagePreview, setImagePreview] = useState(null);
   const fileInputRef = useRef(null);
-  
+
   // সাধারণ ইউজারদের জন্য ৩টি সাবমিশন লিমিট
   const isFreeLimitReached = totalExistingPrompts >= 3;
 
@@ -63,7 +62,7 @@ export default function UserAddPromptForm({ totalExistingPrompts, token }) {
         category: data.category,
         aiTool: data.aiTool,
         tags: data.tags ? data.tags.split(",").map(tag => tag.trim()) : [],
-        difficultyLevel: data.difficultyLevel,
+        difficulty: data.difficulty, // 🎯 ফিক্সড: difficultyLevel -> difficulty
         visibility: data.visibility,
         usageInstructions: data.usageInstructions, 
         thumbnail: uploadedImageUrl,
@@ -75,15 +74,12 @@ export default function UserAddPromptForm({ totalExistingPrompts, token }) {
         creatorRole: "user" 
       };
 
-      // 🎯 ২. 'addPrompt' অ্যাকশনে প্রপ্স থেকে পাওয়া সিকিউরড সার্ভার টোকেনটি পাস করা হলো
-      const result = await addPrompt(promptProduct, token);
+      const result = await addPrompt(promptProduct);
 
       if (result && result.acknowledged) {
         toast.success("User prompt submitted successfully for review!");
         e.target.reset();
         setImagePreview(null); 
-        
-        // কাউন্টার এবং স্টেট ডাটা সিনক্রোনাইজড রাখার জন্য পেজ রিলোড
         window.location.reload();
       }
     } catch (error) {
@@ -121,7 +117,6 @@ export default function UserAddPromptForm({ totalExistingPrompts, token }) {
             <Plus className="text-purple-400 size-6 drop-shadow-[0_0_10px_rgba(168,85,247,0.4)]" />
             <h2 className="text-lg font-black text-white tracking-tight">Add New Prompt Template (User Mode)</h2>
           </div>
-          {/* 🎯 কারেন্ট স্ট্যাটাস ও লিমিট কাউন্টার ট্র্যাকিং ইন্ডিকেটর */}
           <span className="px-2.5 py-0.5 rounded-md text-[10px] font-black uppercase bg-zinc-950 border border-purple-950/40 text-zinc-400">
             Usage: {totalExistingPrompts} / 3 Prompts
           </span>
@@ -170,7 +165,7 @@ export default function UserAddPromptForm({ totalExistingPrompts, token }) {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
           <div className="flex flex-col gap-1.5">
             <label className="text-[10px] font-black text-purple-400 uppercase tracking-widest">Difficulty Level <span className="text-purple-400">*</span></label>
-            <select name="difficultyLevel" defaultValue="" className="w-full bg-zinc-950/60 border border-purple-950/40 rounded-xl px-4 py-3 text-sm text-zinc-300 focus:outline-none focus:border-purple-500/40 transition-colors cursor-pointer" required>
+            <select name="difficulty" defaultValue="" className="w-full bg-zinc-950/60 border border-purple-950/40 rounded-xl px-4 py-3 text-sm text-zinc-300 focus:outline-none focus:border-purple-500/40 transition-colors cursor-pointer" required>
               <option value="" disabled>Select Level</option>
               <option value="Beginner" className="bg-[#080810]">Beginner</option>
               <option value="Intermediate" className="bg-[#080810]">Intermediate</option>
@@ -193,7 +188,7 @@ export default function UserAddPromptForm({ totalExistingPrompts, token }) {
 
         <div className="flex flex-col gap-1.5">
           <label className="text-[10px] font-black text-purple-400 uppercase tracking-widest">Tags (Comma-Separated)</label>
-          <input type="text" name="tags" placeholder="e.g. tailwind, card" className="w-full bg-zinc-940 border border-purple-950/40 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-purple-500/40 transition-all duration-300" />
+          <input type="text" name="tags" placeholder="e.g. tailwind, card" className="w-full bg-zinc-950/40 border border-purple-950/40 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-purple-500/40 transition-all duration-300" />
         </div>
 
         <div className="flex flex-col gap-1.5">
