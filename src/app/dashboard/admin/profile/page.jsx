@@ -1,132 +1,76 @@
-import { auth } from "@/lib/auth";
-import { headers } from "next/headers";
-import Link from "next/link";
-import { Avatar } from "@heroui/react";
-import { getMyPrompts } from "@/lib/api/prompts";
+import { getAdminAnalytics } from "@/lib/api/admin";
+import AdminAnalyticsCharts from "@/components/dashboard/admin/AdminAnalyticsCharts";
+import { getTokenServer } from "@/lib/getTokenServer"; 
 import {
-  HiOutlineMail,
+  HiOutlineUsers,
   HiOutlineDocumentText,
-  HiOutlineCheckCircle,
-  HiOutlineXCircle,
-  HiOutlineSparkles,
+  HiOutlineChatAlt2,
+  HiOutlineDuplicate,
+  HiOutlineCurrencyDollar,
 } from "react-icons/hi";
 
-export default async function AdminProfilePage() {
-  const session = await auth.api.getSession({
-    headers: await headers(),
-  });
+export default async function AdminAnalyticsPage() {
+  
+  const token = await getTokenServer();
 
-  const user = session?.user;
-  const role = user?.role || "admin";
+  
+  const data = await getAdminAnalytics(token);
 
-  const isAdmin = role === "admin";
-  const plan = isAdmin ? "pro lifetime" : (user?.plan || "free");
-  const isVerified = user?.emailVerified;
-  const isPro = isAdmin || plan !== "free";
+ 
+  const stats = [
+    { label: "Total Users", value: data?.totalUsers || 0, icon: HiOutlineUsers, color: "purple" },
+    { label: "Total Prompts", value: data?.totalPrompts || 0, icon: HiOutlineDocumentText, color: "indigo" },
+    { label: "Total Reviews", value: data?.totalReviews || 0, icon: HiOutlineChatAlt2, color: "pink" },
+    { label: "Total Copies", value: data?.totalCopies || 0, icon: HiOutlineDuplicate, color: "violet" },
+    { label: "Total Revenue", value: `$${(data?.totalRevenue || 0).toFixed(2)}`, icon: HiOutlineCurrencyDollar, color: "emerald" },
+  ];
 
-  const promptsData = await getMyPrompts(user?.email);
-  const promptsPublished = promptsData?.totalData || 0;
+  const colorStyles = {
+    purple: "bg-purple-500/10 text-purple-400 border-purple-500/20 shadow-[0_0_15px_rgba(168,85,247,0.05)]",
+    indigo: "bg-indigo-500/10 text-indigo-400 border-indigo-500/20 shadow-[0_0_15px_rgba(99,102,241,0.05)]",
+    pink: "bg-pink-500/10 text-pink-400 border-pink-500/20 shadow-[0_0_15px_rgba(236,72,153,0.05)]",
+    violet: "bg-violet-500/10 text-violet-400 border-violet-500/20 shadow-[0_0_15px_rgba(139,92,246,0.05)]",
+    emerald: "bg-emerald-500/10 text-emerald-400 border-emerald-500/20 shadow-[0_0_15px_rgba(16,185,129,0.05)]",
+  };
 
   return (
-    <div className="max-w-7xl mx-auto">
-      <h1 className="text-3xl font-black text-white tracking-tight">
-        User Account Profile
-      </h1>
-      <p className="text-zinc-500 text-sm mt-1">
-        Manage your plan, credentials, and published prompt details.
-      </p>
+    <div className="max-w-7xl mx-auto p-4 md:p-6 relative">
+    
+      <div className="absolute top-0 right-1/4 w-[350px] h-[350px] bg-purple-900/5 rounded-full blur-[120px] pointer-events-none" />
 
-      <div className="mt-6 bg-zinc-900/30 border border-purple-950/20 rounded-2xl p-6">
-        <div className="flex items-center gap-4">
-          <Avatar className="w-20 h-20 border-2 border-purple-500/30 shrink-0">
-            <Avatar.Image referrerPolicy="no-referrer" alt={user?.name} src={user?.image} />
-            <Avatar.Fallback className="text-2xl font-bold">
-              {user?.name?.charAt(0) || "U"}
-            </Avatar.Fallback>
-          </Avatar>
+  
+      <div className="mb-8 relative z-10">
+        <h1 className="text-2xl md:text-3xl font-black text-white tracking-tight">
+          Administrative System Analytics
+        </h1>
+        <p className="text-zinc-500 text-xs mt-1.5">
+          Aggregate metrics and engine distribution breakdowns across the prompt ecosystem.
+        </p>
+      </div>
 
-          <div className="flex flex-col gap-1.5">
-            <div className="flex items-center gap-2">
-              <p className="text-xl font-bold text-white">{user?.name || "User"}</p>
-              {isPro && (
-                <span className="flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-cyan-500/15 text-cyan-300 border border-cyan-500/30">
-                  💎 PRO
-                </span>
-              )}
+      
+      <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 relative z-10">
+        {stats.map((stat) => (
+          <div 
+            key={stat.label} 
+            className="bg-zinc-900/10 border border-purple-950/20 rounded-2xl p-5 backdrop-blur-sm group hover:border-purple-500/20 transition-all duration-300"
+          >
+            <div className={`w-9 h-9 rounded-xl flex items-center justify-center border ${colorStyles[stat.color]}`}>
+              <stat.icon className="text-lg shrink-0" />
             </div>
-            <div className="flex items-center gap-1.5 text-zinc-400 text-sm">
-              <HiOutlineMail className="text-base" />
-              <span>{user?.email}</span>
-            </div>
-            <div className="flex items-center gap-2 mt-1">
-              <span className="px-3 py-1 rounded-full text-[11px] font-bold uppercase tracking-wide bg-purple-500/15 text-purple-300 border border-purple-500/30">
-                Role: {role}
-              </span>
-              <span className="px-3 py-1 rounded-full text-[11px] font-bold uppercase tracking-wide bg-emerald-500/15 text-emerald-300 border border-emerald-500/30">
-                Plan: {plan}
-              </span>
-            </div>
-          </div>
-        </div>
-
-        <div className="mt-6 border-t border-purple-950/20" />
-
-        <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="bg-zinc-900/40 border border-purple-950/20 rounded-xl p-5">
-            <HiOutlineDocumentText className="text-xl text-purple-400" />
-            <p className="text-[11px] font-bold uppercase tracking-wider text-zinc-500 mt-2">
-              Prompts Published
+            <p className="text-[10px] font-black uppercase tracking-widest text-zinc-500 mt-4">
+              {stat.label}
             </p>
-            <p className="text-2xl font-bold text-white mt-1">{promptsPublished}</p>
-          </div>
-
-          <div className="bg-zinc-900/40 border border-purple-950/20 rounded-xl p-5">
-            {isVerified ? (
-              <>
-                <HiOutlineCheckCircle className="text-xl text-emerald-400" />
-                <p className="text-[11px] font-bold uppercase tracking-wider text-zinc-500 mt-2">
-                  Account Status
-                </p>
-                <p className="text-2xl font-bold text-emerald-400 mt-1">Verified Member</p>
-              </>
-            ) : (
-              <>
-                <HiOutlineXCircle className="text-xl text-red-400" />
-                <p className="text-[11px] font-bold uppercase tracking-wider text-zinc-500 mt-2">
-                  Account Status
-                </p>
-                <p className="text-2xl font-bold text-red-400 mt-1">Unverified</p>
-              </>
-            )}
-          </div>
-        </div>
-
-        {isPro ? (
-          <div className="mt-5 flex items-center gap-3 bg-emerald-500/10 border border-emerald-500/20 rounded-xl p-4">
-            <HiOutlineCheckCircle className="text-xl text-emerald-400 shrink-0" />
-            <p className="text-sm font-semibold text-emerald-300">
-              Lifetime Premium Active – Enjoy complete access to all Prompt Marketplace items!
+            <p className="text-xl md:text-2xl font-black text-white mt-1 font-mono tracking-tight group-hover:text-purple-400 transition-colors">
+              {stat.value}
             </p>
           </div>
-        ) : (
-          <div className="mt-5 flex flex-col sm:flex-row items-center justify-between gap-4 bg-gradient-to-r from-purple-900/30 to-blue-900/20 border border-purple-500/20 rounded-xl p-5">
-            <div className="flex items-start gap-3">
-              <HiOutlineSparkles className="text-xl text-purple-300 mt-0.5 shrink-0" />
-              <div>
-                <p className="font-bold text-white">Upgrade to Pro Lifetime</p>
-                <p className="text-sm text-zinc-400 mt-0.5 max-w-md">
-                  Unlock access to all private prompt templates, parameter sets, and community reviews for a single one-time contribution of $5.
-                </p>
-              </div>
-            </div>
-            <Link
-              href="/payment"
-              className="w-full sm:w-auto text-center shrink-0 rounded-xl bg-gradient-to-r from-orange-500 to-amber-500 font-semibold text-white px-5 py-2.5 transition-all duration-200 hover:shadow-lg hover:shadow-orange-900/30 whitespace-nowrap"
-            >
-              Upgrade Now ($5)
-            </Link>
-          </div>
-        )}
+        ))}
+      </div>
+
+     
+      <div className="mt-8 relative z-10">
+        <AdminAnalyticsCharts engineBreakdown={data?.engineBreakdown || []} />
       </div>
     </div>
   );

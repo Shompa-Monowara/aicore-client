@@ -36,9 +36,7 @@ function CheckoutForm({ clientSecret }) {
       setLoading(false);
     } else if (paymentIntent.status === "succeeded") {
       toast.success("🎉 Payment successful!");
-
-      const userEmail = session?.user?.email || ""; // 🎯 fix — Stripe response এর বদলে session
-
+      const userEmail = session?.user?.email || ""; 
       window.location.href = `${SERVER_URL}/api/payment/success?session_id=${paymentIntent.id}&email=${encodeURIComponent(userEmail)}&prompt_id=${promptId || ""}`;
     }
   };
@@ -46,11 +44,11 @@ function CheckoutForm({ clientSecret }) {
   return (
     <form onSubmit={handleSubmit} className="flex flex-col justify-between h-full min-h-[350px]">
       <div>
-        <h3 className="text-lg font-bold flex items-center gap-2 mb-6 text-zinc-200">
+        <h3 className="text-base font-bold flex items-center gap-2 mb-6 text-zinc-200">
           <HiCreditCard className="text-purple-400" /> Card Information
         </h3>
 
-        <div className="w-full bg-[#121224] border border-zinc-850 rounded-xl p-4 mb-6 shadow-inner">
+        <div className="w-full bg-zinc-950/60 border border-purple-950/40 rounded-xl p-4 mb-6 shadow-inner">
           <CardElement
             options={{
               style: {
@@ -59,9 +57,9 @@ function CheckoutForm({ clientSecret }) {
                   fontFamily: "Inter, sans-serif",
                   fontSmoothing: "antialiased",
                   fontSize: "14px",
-                  "::placeholder": { color: "#52525b" },
+                  "::placeholder": { color: "#3f3f46" },
                 },
-                invalid: { color: "#ef4444", iconColor: "#ef4444" },
+                invalid: { color: "#f43f5e", iconColor: "#f43f5e" },
               },
             }}
           />
@@ -72,27 +70,18 @@ function CheckoutForm({ clientSecret }) {
         <button
           type="submit"
           disabled={!stripe || loading}
-          className="w-full py-3.5 rounded-xl font-bold bg-purple-600 hover:bg-purple-700 active:scale-[0.98] transition-all text-sm shadow-lg shadow-purple-600/20 disabled:opacity-50 text-white"
+          className="w-full py-3.5 rounded-xl font-bold bg-gradient-to-r from-purple-600 to-indigo-600 uppercase tracking-wider text-xs shadow-lg shadow-purple-950/30 disabled:opacity-50 text-white cursor-pointer"
         >
-          {loading ? "Processing..." : "Pay One-time $5.00"}
+          {loading ? "Processing Workspace Access..." : "Pay One-time $5.00"}
         </button>
 
         <div className="text-center pt-2">
-          <span className="text-[10px] text-purple-400 uppercase font-bold tracking-widest block mb-1">
+          <span className="text-[9px] text-purple-400 uppercase font-black tracking-widest block mb-1">
             Stripe Testing Assist
           </span>
-          <p className="text-zinc-500 text-[11px] mb-3 max-w-xs mx-auto">
-            Sandbox mode: type{" "}
-            <span className="text-zinc-300 font-mono">4242 4242 4242 4242</span>, any future
-            expiry, any CVC into the card field above — then submit below.
+          <p className="text-zinc-500 text-[11px] mb-3 max-w-xs mx-auto leading-relaxed">
+            Sandbox mode: type <span className="text-zinc-300 font-mono">4242 4242 4242 4242</span> into the card field above.
           </p>
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full py-3 rounded-xl font-bold bg-cyan-500 text-neutral-950 hover:bg-cyan-400 active:scale-[0.98] transition-all text-sm shadow-lg disabled:opacity-50"
-          >
-            Simulate $5 Test Checkout
-          </button>
         </div>
       </div>
     </form>
@@ -109,7 +98,7 @@ function PaymentContent() {
         if (data.clientSecret) {
           setClientSecret(data.clientSecret);
         } else {
-          toast.error("Stripe configuration error. Check your server keys.");
+          toast.error("Stripe configuration error.");
         }
       });
   }, []);
@@ -126,10 +115,10 @@ function PaymentContent() {
         </p>
       </div>
 
-      <div className="grid md:grid-cols-2 gap-8 max-w-4xl w-full">
-        <div className="bg-[#0d0d1a] border border-zinc-850 rounded-2xl p-8 flex flex-col justify-between shadow-xl">
+      <div className="grid md:grid-cols-2 gap-8 max-w-4xl w-full relative z-10">
+        <div className="bg-zinc-900/10 border border-purple-950/20 rounded-2xl p-8 flex flex-col justify-between shadow-xl backdrop-blur-sm">
           <div>
-            <span className="text-[10px] uppercase tracking-wider bg-cyan-500/10 text-cyan-400 font-bold px-2.5 py-1 rounded-full border border-cyan-500/20">
+            <span className="text-[9px] font-black uppercase tracking-wider bg-purple-500/10 text-purple-400 px-2.5 py-1 rounded-md border border-purple-500/20">
               Lifetime Plan
             </span>
             <h2 className="text-2xl font-bold mt-4">Aiverse Pro Access</h2>
@@ -138,41 +127,30 @@ function PaymentContent() {
               <span className="text-zinc-500 text-sm">/one-time</span>
             </div>
 
-            <ul className="mt-8 space-y-3.5 text-sm text-zinc-300">
+            <ul className="mt-8 space-y-3.5 text-sm text-zinc-300 font-medium">
               <li className="flex items-start gap-3">
-                <HiCheckCircle className="text-cyan-400 text-lg shrink-0 mt-0.5" />
+                <HiCheckCircle className="text-purple-400 text-lg shrink-0 mt-0.5" />
                 <span>Unlock all locked Private/Premium prompts</span>
               </li>
               <li className="flex items-start gap-3">
-                <HiCheckCircle className="text-cyan-400 text-lg shrink-0 mt-0.5" />
+                <HiCheckCircle className="text-purple-400 text-lg shrink-0 mt-0.5" />
                 <span>Unlimited copy-to-clipboard actions</span>
               </li>
               <li className="flex items-start gap-3">
-                <HiCheckCircle className="text-cyan-400 text-lg shrink-0 mt-0.5" />
+                <HiCheckCircle className="text-purple-400 text-lg shrink-0 mt-0.5" />
                 <span>Engage with rating and feedback reviews</span>
-              </li>
-              <li className="flex items-start gap-3">
-                <HiCheckCircle className="text-cyan-400 text-lg shrink-0 mt-0.5" />
-                <span>Priority access to future AI engine configurations</span>
-              </li>
-              <li className="flex items-start gap-3">
-                <HiCheckCircle className="text-cyan-400 text-lg shrink-0 mt-0.5" />
-                <span>One-time payment, lifetime ownership</span>
               </li>
             </ul>
           </div>
-          <p className="text-[11px] text-zinc-500 mt-8 pt-4 border-t border-zinc-800/40">
-            🛡️ Payments secured and encrypted via Stripe Gateway.
-          </p>
         </div>
 
-        <div className="bg-[#0d0d1a] border border-zinc-850 rounded-2xl p-8 shadow-xl min-h-[420px] flex flex-col justify-center">
+        <div className="bg-zinc-900/10 border border-purple-950/20 rounded-2xl p-8 shadow-xl min-h-[420px] flex flex-col justify-center backdrop-blur-sm">
           {clientSecret ? (
             <Elements stripe={stripePromise} options={{ clientSecret }}>
               <CheckoutForm clientSecret={clientSecret} />
             </Elements>
           ) : (
-            <div className="flex flex-col items-center justify-center gap-3 text-zinc-500 text-sm">
+            <div className="flex flex-col items-center justify-center gap-3 text-zinc-500 text-sm font-bold uppercase tracking-wider">
               <div className="w-6 h-6 border-2 border-purple-500 border-t-transparent rounded-full animate-spin"></div>
               Loading Secure Payment Gateway...
             </div>

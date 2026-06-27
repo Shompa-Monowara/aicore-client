@@ -41,7 +41,7 @@ export default function PromptDetailClient({
   const paymentStatus = searchParams.get("payment");
   
   const { data: session } = authClient.useSession();
-  const liveUser = session?.user || initialUser; 
+  const liveUser = session?.user || initialUser;
 
   const [copyCount, setCopyCount] = useState(prompt.copyCount || 0);
   const [bookmarkCount, setBookmarkCount] = useState(
@@ -75,7 +75,6 @@ export default function PromptDetailClient({
   useEffect(() => {
     if (paymentStatus === "success") {
       toast.success("🎉 Payment Successful! Unlocking premium prompt...");
-      
       setTimeout(() => {
         window.location.href = `/all-prompts/${prompt._id}`;
       }, 1500);
@@ -97,7 +96,6 @@ export default function PromptDetailClient({
     }
   };
 
-  // 🎯 এখানে আপনার নতুন কাউন্ট ট্র্যাকিং এবং রিফ্রেশ সহ ফাংশনটি রিপ্লেস করা হলো
   const handleCopy = async () => {
     if (!liveUser) return requireLogin();
     if (isLocked) {
@@ -112,15 +110,13 @@ export default function PromptDetailClient({
         return;
       }
       await navigator.clipboard.writeText(prompt.content);
-      
       if (result && typeof result.copyCount === "number") {
         setCopyCount(result.copyCount);
       } else {
         setCopyCount((prev) => prev + 1);
       }
-      
       toast.success("Prompt copied to clipboard!");
-      router.refresh(); 
+      router.refresh();
     } catch (error) {
       console.error(error);
       toast.error("Could not copy prompt.");
@@ -131,10 +127,15 @@ export default function PromptDetailClient({
     if (!liveUser) return requireLogin();
     setBookmarkLoading(true);
     try {
-      const result = await toggleBookmark(liveUser.email, prompt._id);
+      const result = await toggleBookmark(liveUser.email, prompt._id.toString());
       setIsBookmarked(result.bookmarked);
-      setBookmarkCount((prev) => result.bookmarked ? prev + 1 : prev - 1);
+      if (typeof result.bookmarkCount === "number") {
+        setBookmarkCount(result.bookmarkCount);
+      } else {
+        setBookmarkCount((prev) => (result.bookmarked ? prev + 1 : Math.max(0, prev - 1)));
+      }
       toast.success(result.bookmarked ? "Prompt bookmarked!" : "Bookmark removed!");
+      router.refresh();
     } catch (error) {
       console.error(error);
       toast.error("Something went wrong.");
@@ -145,8 +146,14 @@ export default function PromptDetailClient({
 
   const handleSubmitReview = async () => {
     if (!liveUser) return requireLogin();
-    if (isLocked) { toast.error("Subscribe to Premium to review this prompt."); return; }
-    if (rating === 0) { toast.error("Please select a rating."); return; }
+    if (isLocked && liveUser?.role !== "admin") {
+      toast.error("Subscribe to Premium to review this prompt.");
+      return;
+    }
+    if (rating === 0) {
+      toast.error("Please select a rating.");
+      return;
+    }
     setReviewLoading(true);
     try {
       const review = {
@@ -163,6 +170,8 @@ export default function PromptDetailClient({
         setRating(0);
         setComment("");
         toast.success("Review submitted!");
+      } else {
+        toast.error(result.message || "Could not submit review.");
       }
     } catch (error) {
       console.error(error);
@@ -189,6 +198,8 @@ export default function PromptDetailClient({
         setReportOpen(false);
         setReportDetails("");
         setReportReason(REPORT_REASONS[0]);
+      } else {
+        toast.error(result.message || "Could not submit report.");
       }
     } catch (error) {
       console.error(error);
@@ -199,34 +210,34 @@ export default function PromptDetailClient({
   };
 
   return (
-    <div className="min-h-screen bg-[#080810] text-white">
-      <div className="max-w-7xl mx-auto px-4 py-10">
+    <div className="min-h-screen bg-[#080810] text-white relative overflow-hidden">
+      <div className="absolute top-0 right-1/4 w-[500px] h-[500px] bg-purple-900/5 rounded-full blur-[140px] pointer-events-none" />
 
-        {/* Back */}
+      <div className="max-w-7xl mx-auto px-4 py-10 relative z-10">
+
         <button
           onClick={() => router.back()}
-          className="flex items-center gap-2 text-sm text-zinc-400 hover:text-white transition-colors font-medium group mb-6"
+          className="flex items-center gap-2 text-xs font-black uppercase tracking-widest text-zinc-500 hover:text-purple-400 transition-colors group mb-8 cursor-pointer"
         >
           <HiArrowLeft className="transform group-hover:-translate-x-0.5 transition-transform" />
           Back to previous page
         </button>
 
-        {/* Title Row */}
-        <div className="flex flex-wrap items-start justify-between gap-4 mb-6">
-          <div>
-            <div className="flex items-center gap-2 mb-2">
+        <div className="flex flex-col md:flex-row items-start justify-between gap-6 mb-8 pb-6 border-b border-purple-950/20">
+          <div className="space-y-3">
+            <div className="flex items-center gap-2">
               {isLocked && (
-                <span className="flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold uppercase bg-amber-500/15 text-amber-300 border border-amber-500/30">
-                  <HiLockClosed className="text-xs" /> Premium
+                <span className="flex items-center gap-1 px-3 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-purple-950 text-purple-400 border border-purple-900/30 shadow-[0_0_15px_rgba(147,51,234,0.1)]">
+                  <HiLockClosed className="text-xs" /> Premium Locked
                 </span>
               )}
             </div>
-            <h1 className="text-3xl font-black text-white">{prompt.title}</h1>
-            <p className="text-zinc-400 mt-2 max-w-2xl">{prompt.description}</p>
+            <h1 className="text-2xl md:text-3xl font-black text-white tracking-tight">{prompt.title}</h1>
+            <p className="text-zinc-400 text-sm max-w-3xl leading-relaxed">{prompt.description}</p>
             {Array.isArray(prompt.tags) && prompt.tags.length > 0 && (
-              <div className="flex flex-wrap gap-2 mt-3">
+              <div className="flex flex-wrap gap-1.5 pt-1">
                 {prompt.tags.map((tag, idx) => (
-                  <span key={idx} className="text-[11px] font-medium px-2.5 py-1 rounded-full bg-zinc-800/60 text-zinc-300 border border-zinc-700/50">
+                  <span key={idx} className="text-[10px] font-bold px-2.5 py-0.5 rounded-md bg-zinc-900/40 text-zinc-400 border border-purple-950/20">
                     #{typeof tag === "string" ? tag.trim() : tag}
                   </span>
                 ))}
@@ -238,118 +249,104 @@ export default function PromptDetailClient({
             <button
               onClick={handleBookmark}
               disabled={bookmarkLoading}
-              className={`p-3 rounded-xl border transition-colors disabled:opacity-40 ${
+              className={`p-3 rounded-xl border transition-all cursor-pointer disabled:opacity-40 ${
                 isBookmarked
-                  ? "bg-purple-500/15 text-purple-300 border-purple-500/40"
-                  : "bg-zinc-900/40 text-zinc-400 border-zinc-700/40 hover:border-zinc-600"
+                  ? "bg-purple-600 text-white border-purple-500 shadow-md shadow-purple-950/30"
+                  : "bg-zinc-900/20 text-zinc-400 border-purple-950/20 hover:border-purple-500/30 hover:text-white"
               }`}
             >
               {isBookmarked ? <HiBookmark className="text-lg" /> : <HiOutlineBookmark className="text-lg" />}
             </button>
             <button
               onClick={() => { if (!liveUser) return requireLogin(); setReportOpen(true); }}
-              className="p-3 rounded-xl border bg-zinc-900/40 text-zinc-400 border-zinc-700/40 hover:border-red-500/40 hover:text-red-400 transition-colors"
+              className="p-3 rounded-xl border bg-zinc-900/20 text-zinc-500 border-purple-950/20 hover:border-rose-500/30 hover:text-rose-400 transition-all cursor-pointer"
             >
               <HiOutlineFlag className="text-lg" />
             </button>
           </div>
         </div>
 
-        {/* Thumbnail */}
         {prompt.thumbnail && (
-          <img src={prompt.thumbnail} alt={prompt.title} className="w-full max-h-72 object-cover rounded-2xl mb-6 border border-purple-950/30" />
+          <div className="w-full max-h-72 overflow-hidden rounded-2xl mb-8 border border-purple-950/20">
+            <img src={prompt.thumbnail} alt={prompt.title} className="w-full h-full object-cover opacity-80" />
+          </div>
         )}
 
-        {/* Two Column Layout */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
 
-          {/* LEFT */}
-          <div className="lg:col-span-2 flex flex-col gap-6">
+          <div className="lg:col-span-2 space-y-6">
 
-            {/* Prompt Template */}
-            <div className="bg-[#0f0d1f] border border-purple-950/30 rounded-2xl p-5 relative overflow-hidden">
+            <div className="bg-zinc-900/10 border border-purple-950/20 rounded-2xl p-5 relative overflow-hidden backdrop-blur-sm">
               <div className="flex items-center justify-between mb-4">
-                <h2 className="text-base font-bold text-white">Prompt Template</h2>
+                <h2 className="text-xs font-bold uppercase tracking-wider text-white">Prompt Template Workspace</h2>
                 <button
                   onClick={handleCopy}
-                  className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-bold text-white bg-purple-600 hover:bg-purple-700 transition-all"
+                  className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold text-white bg-gradient-to-r from-purple-600 to-indigo-600 transition-all shadow-md shadow-purple-950/30 cursor-pointer hover:opacity-95"
                 >
                   <HiOutlineClipboardCopy className="text-base" />
-                  {isLocked ? "Unlock to Copy" : "Copy"}
+                  {isLocked ? "Unlock Code Structure" : "Copy Template"}
                 </button>
               </div>
 
               <div onClick={handleContentClick} className={isLocked ? "cursor-pointer" : ""}>
                 <pre 
                   style={isLocked ? { filter: "blur(6px)", userSelect: "none", pointerEvents: "none" } : {}}
-                  className="whitespace-pre-wrap font-mono text-sm text-purple-300 bg-[#090814] border border-purple-950/30 rounded-xl p-4 min-h-[140px]"
+                  className="whitespace-pre-wrap font-mono text-xs text-purple-300 bg-[#0f111a]/40 border border-purple-950/30 rounded-xl p-4 min-h-[140px] leading-relaxed"
                 >
                   {prompt.content}
                 </pre>
               </div>
 
-              {/* subscription button link */}
               {isLocked && (
-                <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-[#080810]/80 backdrop-blur-sm rounded-2xl px-6 text-center">
-                  <HiLockClosed className="text-3xl text-amber-400" />
-                  <p className="text-white font-bold">Premium Prompt Locked</p>
-                  <p className="text-zinc-400 text-sm max-w-sm">
-                    This is a private, premium prompt. Subscribe to unlock the full content and copy it.
+                <div className="absolute inset-0 flex flex-col items-center justify-center bg-[#080810]/90 backdrop-blur-sm rounded-2xl px-6 text-center">
+                  <HiLockClosed className="text-3xl text-purple-400 drop-shadow-[0_0_10px_rgba(168,85,247,0.4)]" />
+                  <h3 className="text-white font-bold mt-3 text-sm">Premium Prompt Locked</h3>
+                  <p className="text-zinc-500 text-xs mt-1.5 max-w-xs leading-relaxed">
+                    This is a private, high-tier prompt architecture. Subscribe to premium deployment workspace to unlock the full layout.
                   </p>
                   <Link 
                     href={`/payment?prompt_id=${prompt._id}`} 
-                    className="mt-1 px-6 py-2.5 rounded-xl text-sm font-bold text-white bg-[#00b4d8] hover:bg-[#0096c7] transition-all shadow-lg text-center inline-block"
+                    className="mt-5 px-6 py-2.5 rounded-xl text-xs font-black uppercase tracking-wider text-white bg-gradient-to-r from-purple-600 to-indigo-600 shadow-lg shadow-purple-950/40 text-center inline-block"
                   >
                     Subscribe to Premium ($5)
                   </Link>
                 </div>
               )}
 
-              {!isLocked && <p className="text-zinc-500 text-xs mt-3">Copied {copyCount} times</p>}
+              {!isLocked && <p className="text-zinc-600 text-[11px] font-medium mt-3">Copied {copyCount} times within the ecosystem.</p>}
             </div>
 
-            {/* Usage Instructions */}
             {prompt.usageInstructions && (
-              <div className="bg-[#0f0d1f] border border-purple-950/30 rounded-2xl p-5">
-                <h2 className="text-base font-bold text-white mb-3">Usage Instructions</h2>
-                <p className="text-zinc-300 text-sm leading-relaxed whitespace-pre-wrap">{prompt.usageInstructions}</p>
+              <div className="bg-zinc-900/10 border border-purple-950/20 rounded-2xl p-5 backdrop-blur-sm">
+                <h2 className="text-sm font-bold uppercase tracking-wider text-white mb-3">Deployment Guide</h2>
+                <p className="text-zinc-400 text-xs leading-relaxed whitespace-pre-wrap">{prompt.usageInstructions}</p>
               </div>
             )}
 
-            {/* Community Reviews */}
-            <div className="bg-[#0f0d1f] border border-purple-950/30 rounded-2xl p-5">
-              <h2 className="text-base font-bold text-white mb-5">
+            <div className="bg-zinc-900/10 border border-purple-950/20 rounded-2xl p-5 backdrop-blur-sm space-y-5">
+              <h2 className="text-sm font-bold uppercase tracking-wider text-white">
                 Community Reviews ({reviewList.length})
               </h2>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
 
-                {/* Submit Form */}
-                <div className="bg-[#090814] border border-purple-950/20 rounded-xl p-4 flex flex-col justify-center h-full min-h-[220px]">
+                <div className="bg-[#0f111a]/40 border border-purple-950/20 rounded-xl p-4 flex flex-col justify-center min-h-[240px]">
                   {isLocked ? (
-                    <div className="flex flex-col items-center text-center gap-2 py-4">
-                      <HiLockClosed className="text-2xl text-amber-400" />
-                      <p className="text-zinc-300 text-sm">Subscribe to Premium to write a review.</p>
-                      <Link 
-                        href={`/payment?prompt_id=${prompt._id}`} 
-                        className="mt-1 px-4 py-2 rounded-xl text-xs font-bold text-white bg-[#00b4d8] hover:bg-[#0096c7] transition-all text-center inline-block"
-                      >
-                        Subscribe to Premium ($5)
-                      </Link>
+                    <div className="flex flex-col items-center text-center p-4">
+                      <HiLockClosed className="text-xl text-zinc-700 mb-2" />
+                      <p className="text-zinc-500 text-xs leading-relaxed">Workspace is locked. Subscribe to premium to post validation ratings.</p>
                     </div>
                   ) : reviewList.some((r) => r.email === liveUser?.email) ? (
-                    <div className="flex items-start gap-2.5 p-4 bg-emerald-950/20 border border-emerald-500/20 rounded-xl text-emerald-400 py-6 w-full">
-                      <div className="flex items-center justify-center w-5 h-5 rounded-full border border-emerald-500/30 text-xs mt-0.5 shrink-0">
-                        ✓
-                      </div>
-                      <p className="text-sm font-medium leading-relaxed">
-                        You have already reviewed this prompt template. Thank you for your feedback!
+                    <div className="flex items-start gap-2.5 p-4 bg-purple-950/20 border border-purple-900/20 rounded-xl text-purple-400 py-6">
+                      <div className="flex items-center justify-center w-5 h-5 rounded-full border border-purple-500/30 text-[10px] mt-0.5 shrink-0">✓</div>
+                      <p className="text-xs font-bold leading-relaxed">
+                        You have already reviewed this prompt template. Thank you for logging your validation feedback!
                       </p>
                     </div>
                   ) : (
                     <>
-                      <p className="text-xs font-bold text-zinc-400 uppercase mb-3">Submit a Review</p>
-                      <p className="text-xs font-medium text-zinc-500 mb-1">RATING</p>
+                      <span className="text-[10px] font-black tracking-widest text-purple-400 uppercase mb-3">Submit a Review</span>
+                      <span className="text-[9px] font-black text-zinc-500 tracking-wider uppercase mb-1">RATING INDEX</span>
                       <div className="flex items-center gap-1 mb-3">
                         {[1, 2, 3, 4, 5].map((star) => (
                           <button 
@@ -359,68 +356,69 @@ export default function PromptDetailClient({
                               toast.success(`Selected ${star} ${star === 1 ? "star" : "stars"}!`);
                             }} 
                             type="button"
+                            className="cursor-pointer"
                           >
                             {star <= rating
-                              ? <HiStar className="text-2xl text-amber-400" />
-                              : <HiOutlineStar className="text-2xl text-zinc-600" />}
+                              ? <HiStar className="text-xl text-amber-400" />
+                              : <HiOutlineStar className="text-xl text-zinc-700" />}
                           </button>
                         ))}
                       </div>
-                      <p className="text-xs font-medium text-zinc-500 mb-1">COMMENT</p>
+                      <span className="text-[9px] font-black text-zinc-500 tracking-wider uppercase mb-1">FEEDBACK COMMENT</span>
                       <textarea
                         value={comment}
                         onChange={(e) => setComment(e.target.value)}
                         rows={4}
-                        placeholder="Write your review here. What worked? How did you test it?"
-                        className="w-full bg-[#0b0813]/50 border border-purple-950/40 rounded-xl px-4 py-3 text-sm text-white placeholder-zinc-600 focus:outline-none focus:border-purple-500/50 transition-colors resize-none"
+                        placeholder="Write your review here. What configurations worked? How did you optimize it?"
+                        className="w-full bg-[#080810]/60 border border-purple-950/40 rounded-xl px-4 py-2.5 text-xs text-white placeholder-zinc-600 focus:outline-none focus:border-purple-500/40 transition-colors resize-none"
                       />
                       <button
                         onClick={handleSubmitReview}
                         disabled={reviewLoading}
-                        className="mt-3 w-full flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold text-white bg-purple-600 hover:bg-purple-700 transition-all disabled:opacity-50"
+                        className="mt-3 w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold text-white bg-gradient-to-r from-purple-600 to-indigo-600 transition-all disabled:opacity-50 cursor-pointer"
                       >
-                        {reviewLoading ? "Submitting..." : "✈ Submit Review"}
+                        {reviewLoading ? "Submitting..." : "Publish Review"}
                       </button>
                     </>
                   )}
                 </div>
 
-                {/* Review List */}
-                <div className="flex flex-col gap-3 max-h-[380px] overflow-y-auto pr-1">
+                <div className="flex flex-col gap-3 max-h-[240px] overflow-y-auto pr-1">
                   {reviewList.length === 0 ? (
-                    <div className="flex flex-col items-center justify-center h-full text-center py-10 gap-3 bg-[#090814] border border-purple-950/20 rounded-xl">
-                      <div className="w-10 h-10 rounded-full border border-zinc-700 flex items-center justify-center">
-                        <HiOutlineUser className="text-zinc-500 text-lg" />
-                      </div>
-                      <p className="text-zinc-400 text-sm">No reviews submitted yet. Be the first to share your thoughts!</p>
+                    <div className="flex flex-col items-center justify-center text-center py-12 bg-[#0f111a]/20 border border-purple-950/10 rounded-xl min-h-[240px]">
+                      <HiOutlineUser className="text-zinc-700 text-xl mb-2" />
+                      <p className="text-zinc-600 text-xs px-4">No validation deployment notes posted yet for this layout.</p>
                     </div>
                   ) : (
                     reviewList.map((r, i) => (
-                      <div key={i} className="bg-[#090814] border border-purple-950/20 rounded-xl p-4">
+                      <div key={i} className="bg-[#0f111a]/30 border border-purple-950/20 rounded-xl p-4 space-y-2">
                         <div className="flex items-center justify-between flex-wrap gap-2">
                           <div className="flex items-center gap-2">
-                            <div className="w-7 h-7 rounded-full bg-purple-500/20 flex items-center justify-center">
-                              <HiOutlineUser className="text-purple-300 text-xs" />
+                            <div className="w-6 h-6 rounded-full bg-purple-950 flex items-center justify-center border border-purple-900/30">
+                              <HiOutlineUser className="text-purple-400 text-xs" />
                             </div>
                             <div>
-                              <p className="text-white font-semibold text-sm">{r.name}</p>
-                              <p className="text-zinc-500 text-xs">{r.email}</p>
+                              <p className="text-white font-bold text-xs truncate max-w-[110px]">{r.name}</p>
                             </div>
                           </div>
-                          <p className="text-zinc-500 text-xs">
+                          <p className="text-zinc-600 text-[10px] font-mono">
                             {new Date(r.createdAt).toLocaleDateString("en-US", {
-                              month: "numeric", day: "numeric", year: "numeric",
+                              month: "short", day: "numeric", year: "numeric",
                             })}
                           </p>
                         </div>
-                        <div className="flex items-center gap-0.5 mt-2">
+                        <div className="flex items-center gap-0.5">
                           {[1, 2, 3, 4, 5].map((star) =>
-                            star <= r.rating
-                              ? <HiStar key={star} className="text-sm text-amber-400" />
-                              : <HiOutlineStar key={star} className="text-sm text-zinc-600" />
+                            star <= r.rating ? (
+                              <HiStar key={star} className="text-xs text-amber-500" />
+                            ) : (
+                              <HiOutlineStar key={star} className="text-xs text-zinc-700" />
+                            )
                           )}
                         </div>
-                        <p className="text-zinc-300 text-sm mt-2">{r.comment}</p>
+                        <p className="text-zinc-400 text-xs leading-relaxed italic">
+                          {`"${r.comment}"`}
+                        </p>
                       </div>
                     ))
                   )}
@@ -431,42 +429,40 @@ export default function PromptDetailClient({
 
           </div>
 
-          {/* RIGHT SIDEBAR */}
-          <div className="flex flex-col gap-4">
+          <div className="space-y-5">
 
-            {/* Prompt Details */}
-            <div className="bg-[#0f0d1f] border border-purple-950/30 rounded-2xl p-5">
-              <h3 className="text-base font-bold text-white mb-4">Prompt Details</h3>
+            <div className="bg-zinc-900/10 border border-purple-950/20 rounded-2xl p-5 backdrop-blur-sm">
+              <h3 className="text-xs font-black uppercase tracking-wider text-zinc-400 mb-4">Template Specification</h3>
               <div className="flex flex-col gap-3">
                 {[
-                  { label: "AI Engine", value: prompt.aiTool, badge: true },
-                  { label: "Category", value: prompt.category, badge: true },
-                  { label: "Difficulty", value: prompt.difficulty || prompt.difficultyLevel || "—", badge: true },
-                  { label: "Visibility", value: prompt.visibility, badge: false },
-                  { label: "Copies Made", value: copyCount, badge: false },
-                  { label: "Bookmarks", value: bookmarkCount, badge: false },
+                  { label: "AI Engine Base", value: prompt.aiTool, badge: true },
+                  { label: "Core Category", value: prompt.category, badge: true },
+                  { label: "Target Complexity", value: prompt.difficulty || "Standard", badge: true },
+                  { label: "Graph Privacy", value: prompt.visibility, badge: false },
+                  { label: "Workspace Copies", value: copyCount, badge: false },
+                  { label: "Global Bookmarks", value: bookmarkCount, badge: false },
                 ].map(({ label, value, badge }, i, arr) => (
                   <div key={label}>
                     <div className="flex items-center justify-between">
-                      <span className="text-zinc-400 text-sm">{label}</span>
+                      <span className="text-zinc-500 text-xs font-semibold">{label}</span>
                       {badge ? (
-                        <span className="px-2.5 py-1 rounded-full text-[11px] font-bold uppercase bg-zinc-800 text-zinc-200 border border-zinc-700">
+                        <span className="px-2.5 py-0.5 rounded-md text-[10px] font-black uppercase tracking-wide bg-zinc-900 text-zinc-300 border border-purple-950/40">
                           {value}
                         </span>
                       ) : (
-                        <span className="text-white text-sm font-semibold uppercase">{value}</span>
+                        <span className="text-white text-xs font-black uppercase tracking-wide">{value}</span>
                       )}
                     </div>
-                    {i < arr.length - 1 && <div className="h-px bg-purple-950/30 mt-3" />}
+                    {i < arr.length - 1 && <div className="h-px bg-purple-950/10 mt-3" />}
                   </div>
                 ))}
-                <div className="h-px bg-purple-950/30" />
+                <div className="h-px bg-purple-950/10" />
                 <div className="flex items-center justify-between">
-                  <span className="text-zinc-400 text-sm">Community Rating</span>
-                  <span className="flex items-center gap-1 text-sm font-bold text-white">
-                    <HiStar className="text-amber-400" />
+                  <span className="text-zinc-500 text-xs font-semibold">User Experience Index</span>
+                  <span className="flex items-center gap-1 text-xs font-black text-white">
+                    <HiStar className="text-amber-500 text-sm" />
                     {prompt.averageRating ? prompt.averageRating.toFixed(1) : "0.0"}
-                    <span className="text-zinc-500 font-normal">
+                    <span className="text-zinc-600 font-medium">
                       ({prompt.reviewCount || reviewList.length})
                     </span>
                   </span>
@@ -474,16 +470,15 @@ export default function PromptDetailClient({
               </div>
             </div>
 
-            {/* Creator Information */}
-            <div className="bg-[#0f0d1f] border border-purple-950/30 rounded-2xl p-5">
-              <h3 className="text-base font-bold text-white mb-4">Creator Information</h3>
+            <div className="bg-zinc-900/10 border border-purple-950/20 rounded-2xl p-5 backdrop-blur-sm">
+              <h3 className="text-xs font-black uppercase tracking-wider text-zinc-400 mb-4">Verified Prompt Architect</h3>
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-full bg-purple-500/20 border border-purple-500/30 flex items-center justify-center shrink-0">
-                  <HiOutlineUser className="text-purple-300 text-lg" />
+                <div className="w-9 h-9 rounded-full bg-purple-400 text-purple-950 font-black border border-purple-500/30 flex items-center justify-center shrink-0">
+                  <HiOutlineUser className="text-base" />
                 </div>
-                <div>
-                  <p className="text-white font-semibold text-sm">{prompt.creatorName || "Creator"}</p>
-                  <p className="text-zinc-500 text-xs">{prompt.creatorEmail || prompt.email || "—"}</p>
+                <div className="min-w-0 flex-1">
+                  <p className="text-white font-bold text-xs truncate">{prompt.creatorName || "Anonymous Architect"}</p>
+                  <p className="text-zinc-600 text-[11px] font-mono truncate mt-0.5">{prompt.creatorEmail || prompt.email || "—"}</p>
                 </div>
               </div>
             </div>
@@ -492,46 +487,51 @@ export default function PromptDetailClient({
         </div>
       </div>
 
-      {/* Report Modal */}
       {reportOpen && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 px-4">
-          <div className="w-full max-w-md bg-[#13112b] border border-purple-950/40 rounded-2xl p-6">
-            <h3 className="text-white font-bold text-lg">Report Prompt</h3>
-            <p className="text-zinc-500 text-sm mt-1">Help us understand the issue.</p>
+        <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 px-4">
+          <div className="w-full max-w-md bg-[#080810] border border-purple-950/50 rounded-2xl p-6 space-y-4 shadow-2xl">
+            <div>
+              <h3 className="text-white font-black text-lg tracking-tight">Report Asset Architecture</h3>
+              <p className="text-zinc-500 text-xs mt-0.5">Help us keep the marketplace safe. Identify the core policy violation issue.</p>
+            </div>
 
-            <p className="text-xs font-medium text-zinc-400 mt-4 mb-2">Reason</p>
-            <select
-              value={reportReason}
-              onChange={(e) => setReportReason(e.target.value)}
-              className="w-full bg-[#0b0813]/80 border border-purple-950/40 rounded-xl px-4 py-3 text-sm text-zinc-300 focus:outline-none focus:border-red-500/50 transition-colors"
-            >
-              {REPORT_REASONS.map((reason) => (
-                <option key={reason} value={reason} className="bg-[#13112b]">{reason}</option>
-              ))}
-            </select>
+            <div>
+              <span className="text-[10px] font-black text-purple-400 tracking-wider uppercase block mb-1.5">Violation Reason</span>
+              <select
+                value={reportReason}
+                onChange={(e) => setReportReason(e.target.value)}
+                className="w-full bg-[#0f111a] border border-purple-950/40 rounded-xl px-4 py-3 text-xs font-semibold text-zinc-300 focus:outline-none focus:border-purple-500/50 transition-colors"
+              >
+                {REPORT_REASONS.map((reason) => (
+                  <option key={reason} value={reason} className="bg-[#080810]">{reason}</option>
+                ))}
+              </select>
+            </div>
 
-            <p className="text-xs font-medium text-zinc-400 mt-4 mb-2">Description (optional)</p>
-            <textarea
-              value={reportDetails}
-              onChange={(e) => setReportDetails(e.target.value)}
-              rows={3}
-              placeholder="Add more details..."
-              className="w-full bg-[#0b0813]/60 border border-purple-950/40 rounded-xl px-4 py-3 text-sm text-white placeholder-zinc-600 focus:outline-none focus:border-red-500/50 transition-colors resize-none"
-            />
+            <div>
+              <span className="text-[10px] font-black text-purple-400 tracking-wider uppercase block mb-1.5">Context Description (optional)</span>
+              <textarea
+                value={reportDetails}
+                onChange={(e) => setReportDetails(e.target.value)}
+                rows={3}
+                placeholder="Provide specific details regarding broken output tokens, licensing bugs, or copyright behaviors..."
+                className="w-full bg-[#0f111a] border border-purple-950/40 rounded-xl px-4 py-2.5 text-xs text-white placeholder-zinc-700 focus:outline-none focus:border-purple-500/50 transition-colors resize-none"
+              />
+            </div>
 
-            <div className="flex items-center justify-end gap-3 mt-5">
+            <div className="flex items-center justify-end gap-2 pt-2">
               <button
                 onClick={() => setReportOpen(false)}
-                className="px-4 py-2 rounded-xl text-sm font-medium text-zinc-400 hover:bg-zinc-900/40 transition-colors"
+                className="px-4 py-2 rounded-xl text-xs font-bold text-zinc-500 hover:text-white transition-colors cursor-pointer"
               >
                 Cancel
               </button>
               <button
                 onClick={handleSubmitReport}
                 disabled={reportLoading}
-                className="px-4 py-2 rounded-xl text-sm font-bold text-white bg-red-500 hover:bg-red-600 transition-colors disabled:opacity-50"
+                className="px-4 py-2 rounded-xl text-xs font-black text-white bg-rose-600 hover:bg-rose-700 shadow-md shadow-rose-950/30 transition-colors disabled:opacity-50 cursor-pointer"
               >
-                {reportLoading ? "Submitting..." : "Submit Report"}
+                {reportLoading ? "Processing..." : "Dispatch Report"}
               </button>
             </div>
           </div>

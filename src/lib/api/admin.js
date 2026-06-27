@@ -1,48 +1,66 @@
 // lib/api/admin.js
 const baseURl = process.env.NEXT_PUBLIC_SERVER_URL;
 
-export const getAdminAnalytics = async () => {
+export const getAdminAnalytics = async (token) => {
   const res = await fetch(`${baseURl}/admin/analytics`, {
     method: "GET",
-    headers: { "Content-Type": "application/json" },
+    headers: { 
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${token}` // 🎯 জিরো বাগ ফিক্সিং হেডার
+    },
+    cache: "no-store"
   });
   const data = await res.json();
   return data;
 };
 
-
-export const getAllUsers = async () => {
+export const getAllUsers = async (token) => {
   const res = await fetch(`${baseURl}/admin/users`, {
     method: "GET",
-    headers: { "Content-Type": "application/json" },
+    headers: { 
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${token}` // 🎯 জিরো বাগ ফিক্সিং হেডার
+    },
+    cache: "no-store"
   });
   const data = await res.json();
   return data;
 };
 
-// new 
-export const getAllPrompts = async () => {
+export const getAllPrompts = async (token) => {
   const res = await fetch(`${baseURl}/admin/prompts`, {
     method: "GET",
-    headers: { "Content-Type": "application/json" },
+    headers: { 
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${token}` // 🎯 জিরো বাগ ফিক্সিং হেডার
+    },
+    cache: "no-store"
   });
   const data = await res.json();
   return data;
 };
 
-export const getReportedPrompts = async () => {
+export const getReportedPrompts = async (token) => {
   const res = await fetch(`${baseURl}/admin/reports`, {
     method: "GET",
-    headers: { "Content-Type": "application/json" },
+    headers: { 
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${token}` // 🎯 জিরো বাগ ফিক্সিং হেডার
+    },
+    cache: "no-store"
   });
   const data = await res.json();
   return data;
 };
 
-export const getAllPayments = async () => {
+export const getAllPayments = async (token) => {
   const res = await fetch(`${baseURl}/admin/payments`, {
     method: "GET",
-    headers: { "Content-Type": "application/json" },
+    headers: { 
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${token}` // 🎯 জিরো বাগ ফিক্সিং হেডার
+    },
+    cache: "no-store"
   });
   const data = await res.json();
   return data;

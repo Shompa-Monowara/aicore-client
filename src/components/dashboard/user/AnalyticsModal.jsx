@@ -1,51 +1,185 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { createPortal } from "react-dom";
-import { HiX, HiChartBar, HiCalendar } from "react-icons/hi";
+import React, { useState } from "react";
 import { Button } from "@heroui/react";
+import { HiX, HiOutlineUpload } from "react-icons/hi";
+import { imageUpload } from "@/lib/imgUpload";
+import { updatePrompt } from "@/lib/action/prompts"; // আপনার প্রম্পট আপডেটের সার্ভার অ্যাকশন
+import toast from "react-hot-toast";
 
-export default function AnalyticsModal({ prompt, onClose }) {
-  const [mounted, setMounted] = useState(false);
-  useEffect(() => { setMounted(true); }, []);
 
-  if (!prompt || !mounted) return null;
+export default function EditPromptModal({ prompt, onClose, onUpdated, token }) {
+  const [loading, setLoading] = useState(false);
+  const [imagePreview, setImagePreview] = useState(prompt?.thumbnail || null);
 
-  return createPortal(
-    <div className="fixed inset-0 z-[999999] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
-      <div className="w-full max-w-sm bg-[#0f0d1f] border border-purple-950/50 rounded-2xl shadow-2xl p-6 text-zinc-300">
+  if (!prompt) return null;
+
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const fileSizeInMB = file.size / (1024 * 1024);
+      if (fileSizeInMB > 5) {
+        toast.error("Image size cannot exceed 5MB!");
+        return;
+      }
+      setImagePreview(URL.createObjectURL(file));
+    }
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+
+    try {
+      const formData = new FormData(e.target);
+      const data = Object.fromEntries(formData.entries());
+
+      let uploadedImageUrl = prompt.thumbnail;
+      // যদি নতুন কোনো ফাইল সিলেক্ট করা হয়
+      if (data.image && data.image.size > 0) {
+        const imageRes = await imageUpload(data.image);
+        uploadedImageUrl = imageRes.url;
+      }
+
+      const updatedData = {
+        title: data.title,
+        description: data.description,
+        content: data.content,
+        category: data.category,
+        aiTool: data.aiTool,
+        tags: data.tags ? data.tags.split(",").map((t) => t.trim()) : [],
+        difficultyLevel: data.difficultyLevel,
+        visibility: data.visibility,
+        usageInstructions: data.usageInstructions,
+        thumbnail: uploadedImageUrl,
+      };
+
+   
+      const result = await updatePrompt(prompt._id, updatedData, token);
+
+      if (result && (result.modifiedCount > 0 || result.acknowledged)) {
+        toast.success("Prompt layout updated successfully!");
+        
+        // স্টেট সিনক্রোনাইজেশন কলব্যাক
+        if (onUpdated) {
+          onUpdated({ ...prompt, ...updatedData });
+        }
+        onClose();
+      } else {
+        toast.error("No structural changes detected.");
+      }
+    } catch (error) {
+      console.error("Update mutation failed:", error);
+      toast.error("Something went wrong. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="fixed inset-0 z-[99999] flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm animate-fadeIn">
+      <div className="w-full max-w-xl bg-[#080810] border border-purple-950/50 rounded-2xl p-6 md:p-8 text-zinc-300 shadow-2xl relative max-h-[90vh] overflow-y-auto scrollbar-thin scrollbar-thumb-purple-950/40">
         
         {/* Header */}
-        <div className="flex justify-between items-center mb-6">
-          <div className="flex items-center gap-3">
-             <div className="text-purple-400 bg-purple-950/40 p-2 rounded-xl"><HiChartBar className="size-6" /></div>
-             <h2 className="text-xl font-bold text-white">Prompt Analytics</h2>
+        <div className="flex justify-between items-center mb-6 border-b border-purple-950/10 pb-4">
+          <h2 className="text-lg font-black text-white tracking-tight">Modify Prompt Blueprint</h2>
+          <button onClick={onClose} className="text-zinc-600 hover:text-white transition-colors cursor-pointer">
+            <HiX size={20} />
+          </button>
+        </div>
+
+        {/* Form Build */}
+        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+          <div className="flex flex-col gap-1.5">
+            <label className="text-[10px] font-black text-purple-400 uppercase tracking-widest">Prompt Title</label>
+            <input type="text" name="title" defaultValue={prompt.title} className="w-full bg-zinc-950/40 border border-purple-950/40 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-purple-500/40 transition-all" required />
           </div>
-          <button onClick={onClose} className="text-zinc-500 hover:text-white"><HiX size={24} /></button>
-        </div>
 
-        {/* Content */}
-        <div className="space-y-4">
-           <h3 className="text-lg font-bold text-white">{prompt.title}</h3>
-           <p className="text-xs text-zinc-500">Performance metrics compiled dynamically.</p>
-           
-           <div className="space-y-3 mt-4">
-             <div className="flex justify-between"><span>Total Copies</span> <span className="text-cyan-400 font-bold">{prompt.copyCount || 0}</span></div>
-             <div className="flex justify-between"><span>Bookmarks Saved</span> <span className="text-purple-400 font-bold">0</span></div>
-             <div className="flex justify-between"><span>Average Review Rating</span> <span className="text-amber-400 font-bold">★ {prompt.averageRating?.toFixed(1) || "0.0"}</span></div>
-             <div className="flex justify-between"><span>Review Feedbacks</span> <span>{prompt.reviewCount || 0} reviews</span></div>
-             <div className="pt-4 border-t border-purple-950/40 flex justify-between">
-                <span className="flex items-center gap-2"><HiCalendar /> Created Date</span> 
-                <span className="text-zinc-400">{new Date(prompt.createdAt).toLocaleDateString()}</span>
-             </div>
-           </div>
-        </div>
+          <div className="flex flex-col gap-1.5">
+            <label className="text-[10px] font-black text-purple-400 uppercase tracking-widest">Short Description</label>
+            <textarea name="description" defaultValue={prompt.description} rows={2} className="w-full bg-zinc-950/40 border border-purple-950/40 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-purple-500/40 transition-all resize-none" required />
+          </div>
 
-        <Button onClick={onClose} className="w-full mt-6 bg-purple-600 text-white font-bold">
-          Close Analytics
-        </Button>
+          <div className="flex flex-col gap-1.5">
+            <label className="text-[10px] font-black text-purple-400 uppercase tracking-widest">Prompt Content Template</label>
+            <textarea name="content" defaultValue={prompt.content} rows={4} className="w-full bg-zinc-950/40 border border-purple-950/40 rounded-xl px-4 py-3 text-sm font-mono text-purple-300 focus:outline-none focus:border-purple-500/40 transition-all resize-none" required />
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="flex flex-col gap-1.5">
+              <label className="text-[10px] font-black text-purple-400 uppercase tracking-widest">Category</label>
+              <select name="category" defaultValue={prompt.category || ""} className="w-full bg-zinc-950/60 border border-purple-950/40 rounded-xl px-4 py-3 text-sm text-zinc-300 focus:outline-none focus:border-purple-500/40 cursor-pointer" required>
+                <option value="Marketing">Marketing</option>
+                <option value="Coding">Coding</option>
+                <option value="Writing">Creative Writing</option>
+                <option value="Other">Other</option>
+              </select>
+            </div>
+
+            <div className="flex flex-col gap-1.5">
+              <label className="text-[10px] font-black text-purple-400 uppercase tracking-widest">AI Engine</label>
+              <select name="aiTool" defaultValue={prompt.aiTool || ""} className="w-full bg-zinc-950/60 border border-purple-950/40 rounded-xl px-4 py-3 text-sm text-zinc-300 focus:outline-none focus:border-purple-500/40 cursor-pointer" required>
+                <option value="ChatGPT">ChatGPT</option>
+                <option value="Claude">Claude</option>
+                <option value="Midjourney">Midjourney</option>
+                <option value="Gemini">Gemini</option>
+              </select>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="flex flex-col gap-1.5">
+              <label className="text-[10px] font-black text-purple-400 uppercase tracking-widest">Difficulty Level</label>
+              <select name="difficultyLevel" defaultValue={prompt.difficultyLevel || "Beginner"} className="w-full bg-zinc-950/60 border border-purple-950/40 rounded-xl px-4 py-3 text-sm text-zinc-300 focus:outline-none focus:border-purple-500/40 cursor-pointer" required>
+                <option value="Beginner">Beginner</option>
+                <option value="Intermediate">Intermediate</option>
+                <option value="Pro">Pro</option>
+              </select>
+            </div>
+
+            <div className="flex flex-col gap-2">
+              <label className="text-[10px] font-black text-purple-400 uppercase tracking-widest">Visibility Status</label>
+              <div className="flex items-center gap-6 h-[46px]">
+                <label className="flex items-center gap-2 cursor-pointer text-sm font-semibold text-zinc-400 hover:text-white transition-colors">
+                  <input type="radio" name="visibility" value="public" defaultChecked={prompt.visibility !== "private"} className="size-4 accent-purple-500" />Public
+                </label>
+                <label className="flex items-center gap-2 cursor-pointer text-sm font-semibold text-zinc-400 hover:text-white transition-colors">
+                  <input type="radio" name="visibility" value="private" defaultChecked={prompt.visibility === "private"} className="size-4 accent-purple-500" />Private
+                </label>
+              </div>
+            </div>
+          </div>
+
+          <div className="flex flex-col gap-1.5">
+            <label className="text-[10px] font-black text-purple-400 uppercase tracking-widest">Tags (Comma-Separated)</label>
+            <input type="text" name="tags" defaultValue={prompt.tags ? prompt.tags.join(", ") : ""} className="w-full bg-zinc-950/40 border border-purple-950/40 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-purple-500/40 transition-all" />
+          </div>
+
+          <div className="flex flex-col gap-1.5">
+            <label className="text-[10px] font-black text-purple-400 uppercase tracking-widest">Thumbnail Image Replacement</label>
+            <label className="border-2 border-dashed border-purple-950/40 rounded-xl p-4 text-center cursor-pointer bg-zinc-950/20 flex flex-col items-center justify-center min-h-[100px] hover:border-purple-500/30 transition-all">
+              <input type="file" name="image" onChange={handleFileChange} accept="image/*" className="hidden" />
+              {imagePreview ? (
+                <img src={imagePreview} alt="Replacement Preview" className="h-16 max-w-[150px] object-cover rounded-md border border-purple-950/20" />
+              ) : (
+                <div className="flex flex-col items-center gap-1 text-zinc-500 text-xs font-bold">
+                  <HiOutlineUpload className="text-xl text-purple-400/80" />
+                  <span>Upload alternative thumbnail file</span>
+                </div>
+              )}
+            </label>
+          </div>
+
+          <div className="flex items-center justify-end gap-3 pt-4 border-t border-purple-950/10">
+            <button type="button" onClick={onClose} className="px-5 py-2.5 rounded-xl text-xs font-bold text-zinc-500 hover:text-white transition-colors cursor-pointer">
+              Cancel
+            </button>
+            <Button type="submit" isLoading={loading} className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 font-bold text-xs uppercase tracking-wider text-white shadow-lg shadow-purple-950/30 cursor-pointer">
+              Save Infrastructure Changes
+            </Button>
+          </div>
+        </form>
       </div>
-    </div>,
-    document.body
+    </div>
   );
 }

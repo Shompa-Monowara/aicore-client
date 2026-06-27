@@ -2,7 +2,6 @@
 
 import React, { useEffect, useState } from "react";
 import { authClient } from "@/lib/auth-client";
-import { getCreatorAnalytics } from "@/lib/api/prompts";
 import { Spinner } from "@heroui/react";
 import { 
   BarChart, Bar, LineChart, Line, 
@@ -12,6 +11,7 @@ import {
   HiOutlineDocumentText,
   HiOutlineClipboardCopy,
   HiOutlineBookmark,
+  HiTrendingUp,
 } from "react-icons/hi";
 
 export default function CreatorAnalyticsDashboard() {
@@ -25,7 +25,19 @@ export default function CreatorAnalyticsDashboard() {
     async function fetchAnalytics() {
       if (user?.email) {
         try {
-          const data = await getCreatorAnalytics(user.email);
+          const tokenRes = await authClient.token();
+          const token = tokenRes?.token;
+
+          const baseURl = process.env.NEXT_PUBLIC_SERVER_URL;
+          const res = await fetch(`${baseURl}/api/creator/analytics?email=${user.email}`, {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+              "Authorization": `Bearer ${token}`,
+            },
+          });
+
+          const data = await res.json();
           setAnalyticsData(data);
         } catch (error) {
           console.error("Failed to load analytics", error);
@@ -41,122 +53,113 @@ export default function CreatorAnalyticsDashboard() {
 
   if (sessionLoading || loading) {
     return (
-      <div className="min-h-[60vh] flex flex-col items-center justify-center text-white gap-2">
+      <div className="min-h-[60vh] flex flex-col items-center justify-center text-white gap-3">
         <Spinner color="secondary" size="lg" />
-        <p className="text-zinc-500 text-sm">Loading Real-time Analytics...</p>
+        <p className="text-zinc-500 text-xs font-black uppercase tracking-widest">Loading Real-time Analytics...</p>
       </div>
     );
   }
 
- 
   const hasRealData = analyticsData?.stats && analyticsData.stats.totalPrompts > 0;
 
   const stats = hasRealData 
     ? analyticsData.stats 
-    : { totalPrompts: 2, totalCopies: 19, totalBookmarks: 4 };
+    : { totalPrompts: 0, totalCopies: 0, totalBookmarks: 0 };
 
   const barData = hasRealData 
     ? analyticsData.barData 
-    : [
-        { name: "Dolor autem acc...", Bookmarks: 3, Copies: 18 },
-        { name: "Nulla error per...", Bookmarks: 1, Copies: 1 }
-      ];
+    : [];
 
   const lineData = hasRealData 
     ? analyticsData.lineData 
-    : [
-        { name: "2026-06-26", "Total Copies": 19, "Total Prompts": 2 }
-      ];
+    : [];
 
   return (
-    <div className="max-w-7xl mx-auto p-6 text-white min-h-screen bg-[#080810]">
-      {/* হেডার */}
-      <div className="mb-8">
-        <h1 className="text-3xl font-black tracking-tight">Creator Analytics Dashboard</h1>
-        <p className="text-zinc-500 text-sm mt-1">Real-time usage statistics and performance insights.</p>
+    <div className="max-w-7xl mx-auto p-4 md:p-6 text-white min-h-screen bg-[#080810] relative overflow-hidden">
+      <div className="absolute top-0 right-1/4 w-[400px] h-[400px] bg-purple-900/5 rounded-full blur-[120px] pointer-events-none" />
+
+      <div className="mb-10 relative z-10">
+        <h1 className="text-2xl md:text-3xl font-black tracking-tight">Creator Analytics Workspace</h1>
+        <p className="text-zinc-500 text-xs mt-1">Real-time template tracking metrics and asset distribution index.</p>
       </div>
 
-      {/* Summary Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-        {/* Total Prompts */}
-        <div className="bg-zinc-900/30 border border-purple-950/20 rounded-2xl p-6 flex items-center gap-4">
-          <div className="p-4 rounded-xl bg-purple-500/10 border border-purple-500/20 text-purple-400">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 mb-10 relative z-10">
+        <div className="bg-zinc-900/10 border border-purple-950/20 rounded-2xl p-6 flex items-center gap-4 backdrop-blur-sm group hover:border-purple-500/20 transition-colors">
+          <div className="p-3.5 rounded-xl bg-purple-500/10 border border-purple-500/20 text-purple-400 shadow-[0_0_15px_rgba(168,85,247,0.05)]">
             <HiOutlineDocumentText className="text-2xl" />
           </div>
           <div>
-            <p className="text-xs font-bold text-zinc-500 uppercase tracking-wider">Total Prompts</p>
-            <p className="text-3xl font-bold mt-1">{stats.totalPrompts}</p>
+            <p className="text-[10px] font-black text-zinc-500 uppercase tracking-widest">Total Prompts</p>
+            <p className="text-2xl md:text-3xl font-black mt-1 font-mono tracking-tight">{stats.totalPrompts}</p>
           </div>
         </div>
 
-        {/* Total Copies */}
-        <div className="bg-zinc-900/30 border border-purple-950/20 rounded-2xl p-6 flex items-center gap-4">
-          <div className="p-4 rounded-xl bg-cyan-500/10 border border-cyan-500/20 text-cyan-400">
+        <div className="bg-zinc-900/10 border border-purple-950/20 rounded-2xl p-6 flex items-center gap-4 backdrop-blur-sm group hover:border-purple-500/20 transition-colors">
+          <div className="p-3.5 rounded-xl bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 shadow-[0_0_15px_rgba(99,102,241,0.05)]">
             <HiOutlineClipboardCopy className="text-2xl" />
           </div>
           <div>
-            <p className="text-xs font-bold text-zinc-500 uppercase tracking-wider">Total Copies</p>
-            <p className="text-3xl font-bold mt-1">{stats.totalCopies}</p>
+            <p className="text-[10px] font-black text-zinc-500 uppercase tracking-widest">Total Copies</p>
+            <p className="text-2xl md:text-3xl font-black mt-1 font-mono tracking-tight">{stats.totalCopies}</p>
           </div>
         </div>
 
-        {/* Total Bookmarks */}
-        <div className="bg-zinc-900/30 border border-purple-950/20 rounded-2xl p-6 flex items-center gap-4">
-          <div className="p-4 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400">
+        <div className="bg-zinc-900/10 border border-purple-950/20 rounded-2xl p-6 flex items-center gap-4 backdrop-blur-sm group hover:border-purple-500/20 transition-colors sm:col-span-2 lg:col-span-1">
+          <div className="p-3.5 rounded-xl bg-pink-500/10 border border-pink-500/20 text-pink-400 shadow-[0_0_15px_rgba(236,72,153,0.05)]">
             <HiOutlineBookmark className="text-2xl" />
           </div>
           <div>
-            <p className="text-xs font-bold text-zinc-500 uppercase tracking-wider">Total Bookmarks</p>
-            <p className="text-3xl font-bold mt-1">{stats.totalBookmarks}</p>
+            <p className="text-[10px] font-black text-zinc-500 uppercase tracking-widest">Total Bookmarks</p>
+            <p className="text-2xl md:text-3xl font-black mt-1 font-mono tracking-tight">{stats.totalBookmarks}</p>
           </div>
         </div>
       </div>
 
-     
-      <div className="flex flex-col gap-8">
-        
-        {/* ১. Bar Chart */}
-        <div className="bg-zinc-900/20 border border-purple-950/20 rounded-2xl p-6">
-          <div className="flex items-center gap-2 mb-6">
-            <HiOutlineClipboardCopy className="text-zinc-400 text-lg" />
-            <h3 className="text-base font-bold">Prompt Templates Copies vs Bookmarks</h3>
+      <div className="flex flex-col gap-8 relative z-10">
+        <div className="bg-zinc-900/10 border border-purple-950/20 rounded-2xl p-6 backdrop-blur-sm">
+          <div className="flex items-center gap-2 mb-8 border-b border-purple-950/10 pb-4">
+            <HiOutlineClipboardCopy className="text-purple-400 text-lg" />
+            <h3 className="text-sm font-black uppercase tracking-wider">Asset Interaction Distribution</h3>
           </div>
-          <div className="h-80 w-full">
+          <div className="h-80 w-full font-mono">
             <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={barData} margin={{ top: 20, right: 30, left: 0, bottom: 5 }}>
+              <BarChart data={barData} margin={{ top: 10, right: 10, left: -25, bottom: 5 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#161329" vertical={false} />
-                <XAxis dataKey="name" stroke="#52525b" fontSize={11} tickLine={false} />
-                <YAxis stroke="#52525b" fontSize={11} tickLine={false} axisLine={false} />
-                <Tooltip contentStyle={{ backgroundColor: "#13112b", borderColor: "#3b0764", color: "#fff" }} />
-                <Legend iconType="square" iconSize={12} verticalAlign="bottom" height={36} />
-                <Bar dataKey="Bookmarks" fill="#a855f7" radius={[4, 4, 0, 0]} barSize={40} />
-                <Bar dataKey="Copies" fill="#06b6d4" radius={[4, 4, 0, 0]} barSize={40} />
+                <XAxis dataKey="name" stroke="#4b5563" fontSize={10} tickLine={false} />
+                <YAxis stroke="#4b5563" fontSize={10} tickLine={false} axisLine={false} />
+                <Tooltip 
+                  cursor={{ fill: "rgba(147, 51, 234, 0.03)" }}
+                  contentStyle={{ backgroundColor: "#080810", borderColor: "#3b0764", borderRadius: "12px", color: "#fff", fontSize: "11px", fontWeight: "bold" }} 
+                />
+                <Legend iconType="circle" iconSize={8} verticalAlign="bottom" height={36} wrapperStyle={{ fontSize: "11px", fontWeight: "bold", textTransform: "uppercase", letterSpacing: "1px", color: "#6b7280" }} />
+                <Bar dataKey="Bookmarks" fill="#ec4899" radius={[4, 4, 0, 0]} barSize={24} />
+                <Bar dataKey="Copies" fill="#8b5cf6" radius={[4, 4, 0, 0]} barSize={24} />
               </BarChart>
             </ResponsiveContainer>
           </div>
         </div>
 
-        {/* ২. Line Chart */}
-        <div className="bg-zinc-900/20 border border-purple-950/20 rounded-2xl p-6">
-          <div className="flex items-center gap-2 mb-6">
-            <span className="text-zinc-400 font-bold">↗</span>
-            <h3 className="text-base font-bold">Accumulative Growth Metrics</h3>
+        <div className="bg-zinc-900/10 border border-purple-950/20 rounded-2xl p-6 backdrop-blur-sm">
+          <div className="flex items-center gap-2 mb-8 border-b border-purple-950/10 pb-4">
+            <HiTrendingUp className="text-purple-400 text-lg" />
+            <h3 className="text-sm font-black uppercase tracking-wider">Accumulative Growth Engine</h3>
           </div>
-          <div className="h-80 w-full">
+          <div className="h-80 w-full font-mono">
             <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={lineData} margin={{ top: 20, right: 30, left: 0, bottom: 5 }}>
+              <LineChart data={lineData} margin={{ top: 10, right: 10, left: -25, bottom: 5 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#161329" vertical={false} />
-                <XAxis dataKey="name" stroke="#52525b" fontSize={11} tickLine={false} />
-                <YAxis stroke="#52525b" fontSize={11} tickLine={false} axisLine={false} />
-                <Tooltip contentStyle={{ backgroundColor: "#13112b", borderColor: "#3b0764", color: "#fff" }} />
-                <Legend iconType="circle" iconSize={8} verticalAlign="bottom" height={36} />
-                <Line type="monotone" dataKey="Total Copies" stroke="#00b4d8" strokeWidth={2} activeDot={{ r: 6 }} dot={{ stroke: "#00b4d8", strokeWidth: 2, r: 4, fill: "#080810" }} />
-                <Line type="monotone" dataKey="Total Prompts" stroke="#9d4edd" strokeWidth={2} activeDot={{ r: 6 }} dot={{ stroke: "#9d4edd", strokeWidth: 2, r: 4, fill: "#080810" }} />
+                <XAxis dataKey="name" stroke="#4b5563" fontSize={10} tickLine={false} />
+                <YAxis stroke="#4b5563" fontSize={10} tickLine={false} axisLine={false} />
+                <Tooltip 
+                  contentStyle={{ backgroundColor: "#080810", borderColor: "#3b0764", borderRadius: "12px", color: "#fff", fontSize: "11px", fontWeight: "bold" }} 
+                />
+                <Legend iconType="circle" iconSize={8} verticalAlign="bottom" height={36} wrapperStyle={{ fontSize: "11px", fontWeight: "bold", textTransform: "uppercase", letterSpacing: "1px", color: "#6b7280" }} />
+                <Line type="monotone" dataKey="Total Copies" stroke="#6366f1" strokeWidth={2.5} activeDot={{ r: 6, fill: "#6366f1" }} dot={{ stroke: "#6366f1", strokeWidth: 2, r: 3, fill: "#080810" }} />
+                <Line type="monotone" dataKey="Total Prompts" stroke="#d946ef" strokeWidth={2.5} activeDot={{ r: 6, fill: "#d946ef" }} dot={{ stroke: "#d946ef", strokeWidth: 2, r: 3, fill: "#080810" }} />
               </LineChart>
             </ResponsiveContainer>
           </div>
         </div>
-
       </div>
     </div>
   );

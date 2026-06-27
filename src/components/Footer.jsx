@@ -8,23 +8,24 @@ import { FaXTwitter } from "react-icons/fa6";
 export default function Footer() {
   const pathname = usePathname();
 
+  // ড্যাশবোর্ডে ফুটার হাইড রাখার লজিক
   if (pathname.includes("dashboard")) {
     return null;
   }
 
   return (
-    <footer className="mt-auto border-t border-purple-500/10 bg-[#0b0813]/80 backdrop-blur-xl shadow-[0_-4px_30px_rgba(0,0,0,0.3)] px-4 sm:px-6 text-zinc-400">
+    <footer className="mt-auto border-t border-purple-500/10 bg-[#080810]/80 backdrop-blur-xl shadow-[0_-4px_30px_rgba(0,0,0,0.3)] px-4 sm:px-6 text-zinc-400">
       <div className="mx-auto max-w-7xl">
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-[1.4fr_1fr_1fr_1fr] gap-12 py-16">
 
-          {/* Logo Section */}
+          {/* 🎯 লোগো সেকশন (ন্যাভবারের সাথে ১০০% ম্যাচ) */}
           <div className="flex flex-col space-y-5">
             <Link href="/">
               <div className="flex items-center gap-3 cursor-pointer group w-fit">
                 <div className="relative flex items-center justify-center transition-transform duration-300 group-hover:scale-105">
                   <svg
-                    className="h-7 w-7 text-orange-500 drop-shadow-[0_0_10px_rgba(249,115,22,0.6)]"
+                    className="h-7 w-7 text-purple-500 drop-shadow-[0_0_10px_rgba(168,85,247,0.5)]"
                     viewBox="0 0 24 24"
                     fill="none"
                     stroke="currentColor"
@@ -45,7 +46,7 @@ export default function Footer() {
 
                 <span className="text-2xl font-black tracking-tight text-white">
                   AI
-                  <span className="bg-gradient-to-r from-orange-400 via-amber-400 to-yellow-300 bg-clip-text text-transparent">
+                  <span className="bg-gradient-to-r from-purple-400 via-pink-400 to-indigo-400 bg-clip-text text-transparent drop-shadow-[0_0_12px_rgba(168,85,247,0.2)]">
                     Core
                   </span>
                 </span>
@@ -68,7 +69,7 @@ export default function Footer() {
               <li>
                 <Link
                   href="/all-prompts"
-                  className="transition-colors hover:text-orange-400"
+                  className="transition-colors hover:text-purple-400"
                 >
                   All Prompts
                 </Link>
@@ -77,7 +78,7 @@ export default function Footer() {
               <li>
                 <Link
                   href="/#trending"
-                  className="transition-colors hover:text-orange-400"
+                  className="transition-colors hover:text-purple-400"
                 >
                   Trending Prompts
                 </Link>
@@ -86,7 +87,7 @@ export default function Footer() {
               <li>
                 <Link
                   href="/auth/login"
-                  className="transition-colors hover:text-orange-400"
+                  className="transition-colors hover:text-purple-400"
                 >
                   Login
                 </Link>
@@ -95,7 +96,7 @@ export default function Footer() {
               <li>
                 <Link
                   href="/auth/register"
-                  className="transition-colors hover:text-orange-400"
+                  className="transition-colors hover:text-purple-400"
                 >
                   Register
                 </Link>
@@ -113,7 +114,7 @@ export default function Footer() {
               <li>
                 <Link
                   href="/#ui-elements"
-                  className="transition-colors hover:text-orange-400"
+                  className="transition-colors hover:text-purple-400"
                 >
                   UI Elements
                 </Link>
@@ -122,7 +123,7 @@ export default function Footer() {
               <li>
                 <Link
                   href="/#features"
-                  className="transition-colors hover:text-orange-400"
+                  className="transition-colors hover:text-purple-400"
                 >
                   Platform Benefits
                 </Link>
@@ -131,7 +132,7 @@ export default function Footer() {
               <li>
                 <Link
                   href="/pricing"
-                  className="transition-colors hover:text-orange-400"
+                  className="transition-colors hover:text-purple-400"
                 >
                   Pricing Plan
                 </Link>
@@ -140,7 +141,7 @@ export default function Footer() {
               <li>
                 <Link
                   href="/#reviews"
-                  className="transition-colors hover:text-orange-400"
+                  className="transition-colors hover:text-purple-400"
                 >
                   Customer Reviews
                 </Link>
@@ -158,28 +159,28 @@ export default function Footer() {
               <div className="flex flex-wrap gap-2.5">
                 <Link
                   href="#"
-                  className="flex h-9 w-9 items-center justify-center rounded-xl border border-purple-950/40 bg-purple-950/10 text-zinc-400 transition-all hover:border-orange-500/40 hover:bg-orange-500/10 hover:text-orange-400"
+                  className="flex h-9 w-9 items-center justify-center rounded-xl border border-purple-950/40 bg-purple-950/10 text-zinc-400 transition-all hover:border-purple-500/40 hover:bg-purple-500/10 hover:text-purple-400"
                 >
                   <FaXTwitter className="h-4 w-4" />
                 </Link>
 
                 <Link
                   href="#"
-                  className="flex h-9 w-9 items-center justify-center rounded-xl border border-purple-950/40 bg-purple-950/10 text-zinc-400 transition-all hover:border-orange-500/40 hover:bg-orange-500/10 hover:text-orange-400"
+                  className="flex h-9 w-9 items-center justify-center rounded-xl border border-purple-950/40 bg-purple-950/10 text-zinc-400 transition-all hover:border-purple-500/40 hover:bg-purple-500/10 hover:text-purple-400"
                 >
                   <FaGithub className="h-4 w-4" />
                 </Link>
 
                 <Link
                   href="#"
-                  className="flex h-9 w-9 items-center justify-center rounded-xl border border-purple-950/40 bg-purple-950/10 text-zinc-400 transition-all hover:border-orange-500/40 hover:bg-orange-500/10 hover:text-orange-400"
+                  className="flex h-9 w-9 items-center justify-center rounded-xl border border-purple-950/40 bg-purple-950/10 text-zinc-400 transition-all hover:border-purple-500/40 hover:bg-purple-500/10 hover:text-purple-400"
                 >
                   <FaLinkedinIn className="h-4 w-4" />
                 </Link>
 
                 <Link
                   href="#"
-                  className="flex h-9 w-9 items-center justify-center rounded-xl border border-purple-950/40 bg-purple-950/10 text-zinc-400 transition-all hover:border-orange-500/40 hover:bg-orange-500/10 hover:text-orange-400"
+                  className="flex h-9 w-9 items-center justify-center rounded-xl border border-purple-950/40 bg-purple-950/10 text-zinc-400 transition-all hover:border-purple-500/40 hover:bg-purple-500/10 hover:text-purple-400"
                 >
                   <FaGlobe className="h-4 w-4" />
                 </Link>
@@ -193,7 +194,7 @@ export default function Footer() {
 
               <a
                 href="mailto:support@aicore.com"
-                className="mt-1 block text-sm font-semibold text-zinc-300 transition-colors hover:text-orange-400"
+                className="mt-1 block text-sm font-semibold text-zinc-300 transition-colors hover:text-purple-400"
               >
                 support@aicore.com
               </a>
@@ -213,7 +214,7 @@ export default function Footer() {
 
           <p>
             Powered by{" "}
-            <span className="font-bold bg-gradient-to-r from-orange-400 to-amber-400 bg-clip-text text-transparent">
+            <span className="font-bold bg-gradient-to-r from-purple-400 to-indigo-400 bg-clip-text text-transparent">
               AICore 
             </span>
           </p>

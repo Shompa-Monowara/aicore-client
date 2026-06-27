@@ -22,27 +22,27 @@ import toast from "react-hot-toast";
 
 export default function SignUpPage() {
   const router = useRouter(); 
-const [role,setRole] = useState("user")
-const [plan,setPlan] = useState("free")
-console.log(role);
+  const [role, setRole] = useState("user");
+  const [plan, setPlan] = useState("free");
 
   const onSubmit = async (e) => {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
     const user = Object.fromEntries(formData.entries());
 
-    const { error,data } = await authClient.signUp.email({
-     ...user,
-     role,
-     plan,
+    const { error, data } = await authClient.signUp.email({
+      ...user,
+      role,
+      plan,
     });
-console.log(data);
+
     if (error) {
       toast.error(error.message || "Signup failed. Please try again.");
       return;
     }
 
     await authClient.signOut();
+    toast.success("Registration successful! Please login.");
     router.push("/auth/login");
   };
 
@@ -57,26 +57,27 @@ console.log(data);
     }
   };
 
+ 
   const inputStyles = {
     inputWrapper: [
       "bg-[#0f111a]",          
-      "border-transparent",     
-      "hover:border-transparent",
-      "focus-within:!border-orange-500/50", 
+      "border border-purple-950/40",     
+      "hover:border-purple-900/40",
+      "focus-within:!border-purple-500/50", 
       "data-[hover=true]:bg-[#0f111a]",
       "group-data-[focus=true]:bg-[#0f111a]",
-      "transition-colors",
+      "transition-all",
       "h-12",                  
     ].join(" "),
     input: "text-white placeholder:text-gray-600 text-[15px]",
   };
 
   return (
-    <div 
-      className="w-full max-w-7xl mx-auto px-4 flex flex-col items-center justify-center min-h-[calc(100vh-220px)] py-12 dark"
-      style={{ backgroundColor: "rgba(11, 8, 19, 0.7)" }} 
-    >
-      <div className="w-full max-w-xl mx-auto rounded-3xl bg-white/[0.02] backdrop-blur-xl border border-white/[0.08] p-8 shadow-[0_20px_50px_rgba(0,0,0,0.6)]">
+    <div className="w-full max-w-7xl mx-auto px-4 flex flex-col items-center justify-center min-h-[calc(100vh-220px)] py-12 dark bg-[#080810]">
+      {/* 🔮 ব্যাকগ্রাউন্ড গ্লো */}
+      <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[350px] h-[350px] bg-purple-600/5 rounded-full blur-[100px] pointer-events-none" />
+
+      <div className="w-full max-w-xl mx-auto rounded-3xl bg-zinc-900/20 backdrop-blur-xl border border-purple-950/30 p-8 shadow-[0_20px_50px_rgba(0,0,0,0.7)] relative z-10">
         <Surface className="w-full bg-transparent">
           <Form onSubmit={onSubmit} className="space-y-6">
             <Fieldset className="w-full space-y-5">
@@ -85,126 +86,105 @@ console.log(data);
                 <Fieldset.Legend className="text-3xl font-black text-white block w-full text-center tracking-tight">
                   Register
                 </Fieldset.Legend>
-                <Description className="text-zinc-400 text-sm mt-1 block">
+                <Description className="text-zinc-500 text-xs mt-1 block">
                   Join the universe of AI prompts and maximize your creativity
                 </Description>
               </div>
 
               <div className="space-y-5">
-                <TextField isRequired name="name" className="flex flex-col gap-2">
-                  <Label className="text-xs font-semibold text-zinc-400 tracking-wider uppercase">
-                    Name
-                  </Label>
-                  <Input 
-                    placeholder="John Doe" 
-                    variant="flat"
-                    classNames={inputStyles}
-                  />
-                  <FieldError />
+                <TextField className="flex flex-col gap-1.5">
+                  <Label className="text-[10px] font-black text-purple-400 tracking-widest uppercase">Name</Label>
+                  <Input isRequired name="name" placeholder="John Doe" variant="flat" classNames={inputStyles} />
+                  <FieldError className="text-rose-400 text-xs mt-1" />
                 </TextField>
 
-                <TextField name="image" type="url" className="flex flex-col gap-2">
-                  <Label className="text-xs font-semibold text-zinc-400 tracking-wider uppercase">
-                    Image URL
-                  </Label>
-                  <Input 
-                    placeholder="Image URL" 
-                    variant="flat"
-                    classNames={inputStyles}
-                  />
-                  <FieldError />
+                <TextField className="flex flex-col gap-1.5">
+                  <Label className="text-[10px] font-black text-purple-400 tracking-widest uppercase">Image URL</Label>
+                  <Input name="image" type="url" placeholder="https://example.com/avatar.jpg" variant="flat" classNames={inputStyles} />
+                  <FieldError className="text-rose-400 text-xs mt-1" />
                 </TextField>
 
-                <TextField isRequired name="email" type="email" className="flex flex-col gap-2">
-                  <Label className="text-xs font-semibold text-zinc-400 tracking-wider uppercase">
-                    Email Address
-                  </Label>
-                  <Input 
-                    placeholder="john@example.com" 
-                    variant="flat"
-                    classNames={inputStyles}
-                  />
-                  <FieldError />
+                <TextField className="flex flex-col gap-1.5">
+                  <Label className="text-[10px] font-black text-purple-400 tracking-widest uppercase">Email Address</Label>
+                  <Input isRequired name="email" type="email" placeholder="john@example.com" variant="flat" classNames={inputStyles} />
+                  <FieldError className="text-rose-400 text-xs mt-1" />
                 </TextField>
 
-                <TextField isRequired name="password" type="password" className="flex flex-col gap-2">
-                  <Label className="text-xs font-semibold text-zinc-400 tracking-wider uppercase">
-                    Password
-                  </Label>
-                  <Input 
-                    placeholder="Password" 
-                    variant="flat"
-                    classNames={inputStyles}
-                  />
-                  <FieldError />
+                <TextField className="flex flex-col gap-1.5">
+                  <Label className="text-[10px] font-black text-purple-400 tracking-widest uppercase">Password</Label>
+                  <Input isRequired name="password" type="password" placeholder="••••••••" variant="flat" classNames={inputStyles} />
+                  <FieldError className="text-rose-400 text-xs mt-1" />
                 </TextField>
 
-                <Select 
-                  isRequired 
-                  name="role" 
-                  placeholder="Select one"
-                  onChange={(value) => setRole(value)}
-                  defaultValue={role}
-                  variant="flat"
-                  classNames={{
-                    trigger: "bg-[#0f111a] border-transparent text-white hover:border-transparent data-[hover=true]:bg-[#0f111a] h-12 rounded-xl",
-                    value: "text-white text-[15px]",
-                    label: "text-xs font-semibold text-zinc-400 tracking-wider uppercase mb-2",
-                    popoverContent: "bg-[#0b0813] border border-white/[0.1]"
-                  }}
-                >
-                  <Label>Signup As</Label>
-                  <Select.Trigger>
-                    <Select.Value />
-                    <Select.Indicator />
-                  </Select.Trigger>
-                  <Select.Popover>
-                    <ListBox className="text-white">
-                      <ListBox.Item id="user" textValue="user" className="hover:bg-orange-500/20 data-[hover=true]:bg-orange-500/20">
-                        User
-                        <ListBox.ItemIndicator />
-                      </ListBox.Item>
-                      <ListBox.Item id="creator" textValue="creator" className="hover:bg-orange-500/20 data-[hover=true]:bg-orange-500/20">
-                        Creator
-                        <ListBox.ItemIndicator />
-                      </ListBox.Item>
-                    </ListBox>
-                  </Select.Popover>
-                </Select>
+                <div className="flex flex-col gap-1.5">
+                  <Label className="text-[10px] font-black text-purple-400 tracking-widest uppercase">Signup As</Label>
+                  <Select 
+                    isRequired 
+                    name="role" 
+                    placeholder="Select role"
+                    onChange={(value) => setRole(value)}
+                    defaultValue={role}
+                    variant="flat"
+                    classNames={{
+                      trigger: "bg-[#0f111a] border border-purple-950/40 text-white hover:border-purple-900/40 data-[hover=true]:bg-[#0f111a] h-12 rounded-xl transition-all",
+                      value: "text-white text-[15px] font-medium",
+                      popoverContent: "bg-[#080810] border border-purple-950/50"
+                    }}
+                  >
+                    <Select.Trigger>
+                      <Select.Value />
+                      <Select.Indicator />
+                    </Select.Trigger>
+                    <Select.Popover>
+                      <ListBox className="text-zinc-300">
+                        <ListBox.Item id="user" textValue="user" className="hover:bg-purple-950/40 data-[hover=true]:bg-purple-950/40 hover:text-purple-400 rounded-lg">
+                          User
+                          <ListBox.ItemIndicator />
+                        </ListBox.Item>
+                        <ListBox.Item id="creator" textValue="creator" className="hover:bg-purple-950/40 data-[hover=true]:bg-purple-950/40 hover:text-purple-400 rounded-lg">
+                          Creator
+                          <ListBox.ItemIndicator />
+                        </ListBox.Item>
+                      </ListBox>
+                    </Select.Popover>
+                  </Select>
+                </div>
               </div>
 
+            
               <Button 
                 type="submit" 
-                className="w-full bg-gradient-to-r from-orange-500 to-amber-500 font-semibold text-white py-2.5 rounded-xl shadow-[0_0_20px_rgba(245,158,11,0.4)] hover:opacity-90 transition-all mt-6"
+                className="w-full bg-gradient-to-r from-purple-600 to-indigo-600 font-bold text-sm text-white py-3 rounded-xl shadow-[0_0_20px_rgba(147,51,234,0.3)] hover:opacity-95 transition-all mt-6 cursor-pointer"
               >
-                Signup
+                Create Account
               </Button>
             </Fieldset>
           </Form>
 
-          <div className="mt-6 space-y-6">
-            <div className="flex items-center my-4">
-              <div className="flex-grow border-t border-zinc-800/60"></div>
-              <span className="px-3 text-xs text-zinc-500 font-medium whitespace-nowrap uppercase tracking-wider">
+        
+          <div className="mt-6 space-y-5">
+            <div className="flex items-center">
+              <div className="flex-grow border-t border-purple-950/20"></div>
+              <span className="px-3 text-[10px] text-zinc-500 font-bold uppercase tracking-widest whitespace-nowrap">
                 or continue with
               </span>
-              <div className="flex-grow border-t border-zinc-800/60"></div>
+              <div className="flex-grow border-t border-purple-950/20"></div>
             </div>
 
             <Button
               onClick={handleGoogleSignUp}
               variant="bordered"
-              className="w-full border-zinc-800 bg-zinc-900/40 text-white font-semibold py-2.5 rounded-xl bg-transparent hover:bg-zinc-800 hover:border-zinc-700 transition-all flex items-center justify-center gap-2"
+              className="w-full border-zinc-800 bg-zinc-900/40 hover:bg-zinc-900 text-zinc-300 hover:text-white font-bold h-12 rounded-xl transition-all flex items-center justify-center gap-2 text-sm cursor-pointer"
             >
               <FcGoogle className="text-xl" />
               Sign Up with Google
             </Button>
 
-            <div className="text-center text-sm text-zinc-400 mt-4">
+            <div className="text-center text-xs text-zinc-500 font-medium">
               Already have an account?{" "}
               <Link 
                 href="/auth/login" 
-                className="bg-gradient-to-r from-orange-400 to-amber-400 bg-clip-text text-transparent font-bold transition-colors ml-1"
+                className="bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent font-black ml-1 uppercase text-[11px] tracking-wider"
               >
                 Log in here
               </Link>

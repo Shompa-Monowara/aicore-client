@@ -1,42 +1,44 @@
 "use client";
 
 import { useState } from "react";
-import Link from "next/link";
+import { deletePrompt } from "@/lib/action/prompts";
 import {
-  dismissReport,
-  warnCreator,
-  removeReportedPrompt,
+  updatePromptStatus,
+  togglePromptFeatured,
 } from "@/lib/action/admin";
 import toast from "react-hot-toast";
 import {
-  HiOutlineExclamation,
-  HiOutlineCalendar,
-  HiOutlineUser,
   HiOutlineEye,
   HiOutlineCheckCircle,
-  HiOutlineFlag,
+  HiOutlineXCircle,
   HiOutlineTrash,
+  HiStar,
+  HiOutlineStar,
 } from "react-icons/hi";
 
-const statusBadge = {
-  pending: "bg-red-500/15 text-red-300 border-red-500/30",
-  dismissed: "bg-zinc-700/30 text-zinc-400 border-zinc-700/40",
-  warned: "bg-amber-500/15 text-amber-300 border-amber-500/30",
+const statusStyles = {
+  pending: "bg-amber-500/10 text-amber-400 border-amber-500/20 shadow-[0_0_12px_rgba(245,158,11,0.05)]",
+  approved: "bg-emerald-500/10 text-emerald-400 border-emerald-500/20 shadow-[0_0_12px_rgba(16,185,129,0.05)]",
+  rejected: "bg-rose-500/10 text-rose-400 border-rose-500/20 shadow-[0_0_12px_rgba(244,63,94,0.05)]",
 };
 
-export default function ReportedPromptsList({ reports }) {
-  const [items, setItems] = useState(reports);
+// 🎯 ১. প্রপ্স এর ভেতর 'token' রিসিভ করা হলো
+export default function AllPromptsTable({ prompts, token }) {
+  const [items, setItems] = useState(prompts || []); // সেফগার্ড হিসেবে খালি অ্যারে রাখা হলো
   const [busyId, setBusyId] = useState(null);
+  const [rejectTarget, setRejectTarget] = useState(null); 
+  const [feedbackText, setFeedbackText] = useState("");
 
-  const handleDismiss = async (id) => {
+  const handleApprove = async (id) => {
     setBusyId(id);
     try {
-      const result = await dismissReport(id);
-      if (result.modifiedCount > 0) {
+      // 🎯 ২. এপিআই অ্যাকশনে টোকেন পাস করা হলো
+      const result = await updatePromptStatus(id, "approved", "", token);
+      if (result && result.modifiedCount > 0) {
         setItems((prev) =>
-          prev.map((r) => (r._id === id ? { ...r, status: "dismissed" } : r))
+          prev.map((p) => (p._id === id ? { ...p, status: "approved" } : p))
         );
-        toast.success("Report dismissed.");
+        toast.success("Prompt approved!");
       }
     } catch (error) {
       console.error(error);
@@ -46,15 +48,30 @@ export default function ReportedPromptsList({ reports }) {
     }
   };
 
-  const handleWarn = async (id) => {
-    setBusyId(id);
+  const openRejectModal = (id) => {
+    setRejectTarget(id);
+    setFeedbackText("");
+  };
+
+  const confirmReject = async () => {
+    if (!feedbackText.trim()) {
+      toast.error("Please provide rejection feedback.");
+      return;
+    }
+    setBusyId(rejectTarget);
     try {
-      const result = await warnCreator(id);
-      if (result.modifiedCount > 0) {
+      // 🎯 ৩. রিজেক্ট অ্যাকশনে টোকেন পাস করা হলো
+      const result = await updatePromptStatus(rejectTarget, "rejected", feedbackText, token);
+      if (result && result.modifiedCount > 0) {
         setItems((prev) =>
-          prev.map((r) => (r._id === id ? { ...r, status: "warned" } : r))
+          prev.map((p) =>
+            p._id === rejectTarget
+              ? { ...p, status: "rejected", rejectionFeedback: feedbackText }
+              : p
+          )
         );
-        toast.success("Creator warned.");
+        toast.success("Prompt rejected with feedback.");
+        setRejectTarget(null);
       }
     } catch (error) {
       console.error(error);
@@ -64,14 +81,34 @@ export default function ReportedPromptsList({ reports }) {
     }
   };
 
-  const handleRemove = async (id) => {
-    if (!confirm("Remove this prompt permanently? This cannot be undone.")) return;
+  const handleToggleFeature = async (id, current) => {
     setBusyId(id);
     try {
-      const result = await removeReportedPrompt(id);
-      if (result.deletedCount > 0) {
-        setItems((prev) => prev.filter((r) => r._id !== id));
-        toast.success("Prompt removed.");
+      // 🎯 ৪. ফিচার টগলে টোকেন পাস করা হলো
+      const result = await togglePromptFeatured(id, !current, token);
+      if (result && result.modifiedCount > 0) {
+        setItems((prev) =>
+          prev.map((p) => (p._id === id ? { ...p, featured: !current } : p))
+        );
+        toast.success(!current ? "Marked as featured!" : "Removed from featured.");
+      }
+    } catch (error) {
+      console.error(error);
+      toast.error("Something went wrong.");
+    } finally {
+      setBusyId(null);
+    }
+  };
+
+  const handleDelete = async (id) => {
+    if (!confirm("Are you sure you want to permanently delete this prompt?")) return;
+    setBusyId(id);
+    try {
+      // 🎯 ৫. ডিলিট অ্যাকশনে টোকেন পাস করা হলো (যদি ডিলিট রাউটেও verifyToken থাকে)
+      const result = await deletePrompt(id, token);
+      if (result && result.deletedCount > 0) {
+        setItems((prev) => prev.filter((p) => p._id !== id));
+        toast.success("Prompt deleted.");
       }
     } catch (error) {
       console.error(error);
@@ -83,86 +120,146 @@ export default function ReportedPromptsList({ reports }) {
 
   return (
     <>
-      {items.map((report) => (
-        <div
-          key={report._id}
-          className="bg-zinc-900/30 border border-purple-950/20 rounded-2xl p-6"
-        >
-          <div className="flex items-center justify-between flex-wrap gap-2">
-            <span
-              className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-bold uppercase border ${
-                statusBadge[report.status] || statusBadge.pending
-              }`}
-            >
-              <HiOutlineExclamation className="text-sm" />
-              Reason: {report.reason || "Other"}
-            </span>
-            <span className="flex items-center gap-1.5 text-zinc-500 text-xs">
-              <HiOutlineCalendar />
-              Reported on{" "}
-              {report.createdAt
-                ? new Date(report.createdAt).toLocaleDateString("en-US", {
-                    month: "numeric",
-                    day: "numeric",
-                    year: "numeric",
-                  })
-                : "—"}
-            </span>
-          </div>
+      <div className="w-full text-sm overflow-x-auto block scrollbar-thin scrollbar-thumb-purple-950/40">
+        <table className="w-full text-left border-collapse min-w-[950px]">
+          <thead>
+            <tr className="border-b border-purple-950/30 bg-zinc-950/40 text-zinc-400 font-black text-[10px] tracking-widest uppercase">
+              <th className="px-6 py-4.5">Template Title</th>
+              <th className="px-5 py-4.5">Creator</th>
+              <th className="px-5 py-4.5">AI Engine</th>
+              <th className="px-5 py-4.5">Visibility</th>
+              <th className="px-5 py-4.5">Featured</th>
+              <th className="px-5 py-4.5">Status</th>
+              <th className="px-5 py-4.5 text-right">Actions Panel</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-purple-950/10 text-zinc-300">
+            {items?.map((p) => (
+              <tr
+                key={p._id}
+                className="hover:bg-purple-950/5 transition-colors duration-150 group"
+              >
+                <td className="px-6 py-4">
+                  <p className="text-white font-bold text-sm tracking-tight group-hover:text-purple-400 transition-colors">{p.title}</p>
+                  <p className="text-zinc-500 text-[11px] font-medium mt-0.5 capitalize">Category: {p.category}</p>
+                </td>
+                
+                <td className="px-5 py-4">
+                  <p className="text-white font-semibold text-xs">{p.creatorName || "Anonymous Creator"}</p>
+                  <p className="text-zinc-500 text-[11px] font-mono mt-0.5">{p.email}</p>
+                </td>
+                
+                <td className="px-5 py-4">
+                  <span className="px-2.5 py-0.5 rounded-md text-[10px] font-black uppercase bg-zinc-900 text-purple-400 border border-purple-950/40">
+                    {p.aiTool || "—"}
+                  </span>
+                </td>
+                
+                <td className="px-5 py-4 text-zinc-400 text-xs font-bold uppercase tracking-wider">
+                  {p.visibility || "Public"}
+                </td>
+                
+                <td className="px-5 py-4">
+                  <button
+                    onClick={() => handleToggleFeature(p._id, p.featured)}
+                    disabled={busyId === p._id}
+                    className={`flex items-center gap-1.5 px-3 py-1 rounded-xl text-[10px] font-black uppercase border transition-all cursor-pointer disabled:opacity-40 ${
+                      p.featured
+                        ? "bg-amber-500/10 text-amber-400 border-amber-500/30 shadow-[0_0_12px_rgba(245,158,11,0.1)]"
+                        : "bg-zinc-900/20 text-zinc-500 border-purple-950/20 hover:border-purple-500/30 hover:text-white"
+                    }`}
+                  >
+                    {p.featured ? <HiStar className="text-sm" /> : <HiOutlineStar className="text-sm" />}
+                    {p.featured ? "Featured" : "Feature"}
+                  </button>
+                </td>
+                
+                <td className="px-5 py-4">
+                  <span className={`px-2.5 py-0.5 rounded-md text-[9px] font-black uppercase border ${statusStyles[p.status] || statusStyles.pending}`}>
+                    {p.status || "PENDING"}
+                  </span>
+                </td>
+                
+                <td className="px-5 py-4 text-right">
+                  <div className="flex items-center justify-end gap-2">
+                    <button
+                      disabled
+                      title="View Details (coming soon)"
+                      className="p-2 rounded-xl text-zinc-600 bg-zinc-900/10 border border-purple-950/10 cursor-not-allowed"
+                    >
+                      <HiOutlineEye className="text-base" />
+                    </button>
 
-          <h3 className="text-white font-bold text-lg mt-3">
-            Prompt: {report.promptTitle || "Untitled"}
-          </h3>
+                    <button
+                      onClick={() => handleApprove(p._id)}
+                      disabled={busyId === p._id || p.status === "approved"}
+                      title="Approve Asset"
+                      className="p-2 rounded-xl text-emerald-400 bg-zinc-900/40 border border-purple-950/30 hover:bg-emerald-500/10 hover:border-emerald-500/30 transition-all disabled:opacity-20 cursor-pointer"
+                    >
+                      <HiOutlineCheckCircle className="text-base" />
+                    </button>
 
-          <div className="mt-3 bg-[#0b0813]/50 border border-purple-950/30 rounded-xl px-4 py-3">
-            <span className="text-zinc-400 text-sm font-semibold">Report Details: </span>
-            <span className="text-zinc-300 text-sm">"{report.details}"</span>
-          </div>
+                    <button
+                      onClick={() => openRejectModal(p._id)}
+                      disabled={busyId === p._id || p.status === "rejected"}
+                      title="Reject Asset"
+                      className="p-2 rounded-xl text-rose-400 bg-zinc-900/40 border border-purple-950/30 hover:bg-rose-500/10 hover:border-rose-500/30 transition-all disabled:opacity-20 cursor-pointer"
+                    >
+                      <HiOutlineXCircle className="text-base" />
+                    </button>
 
-          <div className="mt-4 border-t border-purple-950/20" />
+                    <button
+                      onClick={() => handleDelete(p._id)}
+                      disabled={busyId === p._id}
+                      title="Delete Permanently"
+                      className="p-2 rounded-xl text-zinc-500 bg-zinc-900/40 border border-purple-950/30 hover:bg-rose-600 hover:text-white hover:border-rose-500/30 transition-all disabled:opacity-20 cursor-pointer"
+                    >
+                      <HiOutlineTrash className="text-base" />
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
 
-          <div className="flex items-center justify-between flex-wrap gap-3 mt-4">
-            <div className="flex items-center gap-1.5 text-zinc-500 text-sm">
-              <HiOutlineUser />
-              Reported by: {report.reportedByName} ({report.reportedByEmail})
+      {rejectTarget && (
+        <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 px-4">
+          <div className="w-full max-w-md bg-[#080810] border border-purple-950/50 rounded-2xl p-6 space-y-4 shadow-2xl">
+            <div>
+              <h3 className="text-white font-black text-lg tracking-tight">Reject Asset Blueprint</h3>
+              <p className="text-zinc-500 text-xs mt-0.5">
+                Provide feedback explaining why this prompt does not meet platform guidelines.
+              </p>
             </div>
-
-            <div className="flex items-center gap-2">
-              <Link
-                href={`/all-prompts/${report.promptId}`}
-                title="Inspect reported prompt"
-                className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold text-zinc-300 bg-zinc-900/50 hover:bg-zinc-800 hover:text-white transition-colors"
-              >
-                <HiOutlineEye className="text-sm" /> Inspect
-              </Link>
-
+            
+            <textarea
+              value={feedbackText}
+              onChange={(e) => setFeedbackText(e.target.value)}
+              rows={4}
+              placeholder="e.g. Content architecture violates copyright or formatting guidelines..."
+              className="w-full bg-[#0f111a] border border-purple-950/40 rounded-xl px-4 py-3 text-xs text-white placeholder-zinc-700 focus:outline-none focus:border-purple-500/50 transition-colors resize-none"
+            />
+            
+            <div className="flex items-center justify-end gap-2 pt-2">
               <button
-                onClick={() => handleDismiss(report._id)}
-                disabled={busyId === report._id || report.status === "dismissed"}
-                className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold text-emerald-300 bg-emerald-500/10 hover:bg-emerald-500/20 transition-colors disabled:opacity-30"
+                onClick={() => setRejectTarget(null)}
+                className="px-4 py-2 rounded-xl text-xs font-bold text-zinc-500 hover:text-white transition-colors cursor-pointer"
               >
-                <HiOutlineCheckCircle className="text-sm" /> Dismiss
+                Cancel
               </button>
-
               <button
-                onClick={() => handleWarn(report._id)}
-                disabled={busyId === report._id || report.status === "warned"}
-                className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold text-amber-300 bg-amber-500/10 hover:bg-amber-500/20 transition-colors disabled:opacity-30"
+                onClick={confirmReject}
+                disabled={busyId === rejectTarget}
+                className="px-4 py-2 rounded-xl text-xs font-black text-white bg-rose-600 hover:bg-rose-700 shadow-md shadow-rose-950/30 transition-colors disabled:opacity-50 cursor-pointer"
               >
-                <HiOutlineFlag className="text-sm" /> Warn Creator
-              </button>
-
-              <button
-                onClick={() => handleRemove(report._id)}
-                disabled={busyId === report._id}
-                className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold text-red-300 bg-red-500/10 hover:bg-red-500/20 transition-colors disabled:opacity-30"
-              >
-                <HiOutlineTrash className="text-sm" /> Remove Prompt
+                Confirm Reject
               </button>
             </div>
           </div>
         </div>
-      ))}
+      )}
     </>
   );
 }

@@ -1,22 +1,20 @@
-import AddPromptForm from "@/components/dashboard/user/AddPromptForm";
 import { getMyPrompts } from "@/lib/api/prompts";
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
 import MyPromptsTable from "@/components/dashboard/user/MyPromptsTable";
 import { HiOutlineExclamationCircle } from "react-icons/hi";
+import { getTokenServer } from "@/lib/getTokenServer"; // 🎯 টোকেন ইম্পোর্ট
 
 export default async function MyPromptsPage() {
   const session = await auth.api.getSession({ headers: await headers() });
   const email = session?.user?.email;
+  const token = await getTokenServer(); // 🎯 টোকেন রিড
 
-  const promptsData = await getMyPrompts(email);
+  const promptsData = await getMyPrompts(email, token); // 🎯 টোকেন পাস
   const prompts = promptsData?.data || [];
 
   return (
-    // পুরো পেজটিকে সেন্টারে রাখার জন্য flex এবং items-center ব্যবহার করা হয়েছে
     <div className="w-full min-h-screen py-10 px-4 flex flex-col items-center">
-      
-      {/* হেডিং সেকশন (সেন্টারে) */}
       <div className="w-full max-w-4xl text-center mb-8">
         <h1 className="text-3xl font-black text-white tracking-tight">
           My Prompt Templates
@@ -26,7 +24,6 @@ export default async function MyPromptsPage() {
         </p>
       </div>
 
-      {/* টেবিল কন্টেইনার (সেন্টারে) */}
       <div className="w-full max-w-4xl bg-[#0f0d26]/40 border border-purple-950/30 rounded-2xl overflow-hidden backdrop-blur-md shadow-[0_4px_30px_rgba(0,0,0,0.3)]">
         {prompts.length === 0 ? (
           <div className="flex flex-col items-center justify-center text-center py-16 px-6">
@@ -37,10 +34,9 @@ export default async function MyPromptsPage() {
             </p>
           </div>
         ) : (
-          <MyPromptsTable prompts={prompts} />
+          <MyPromptsTable prompts={prompts} token={token} />
         )}
       </div>
-      
     </div>
   );
 }
