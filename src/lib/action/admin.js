@@ -2,28 +2,26 @@
 
 const baseURl = process.env.NEXT_PUBLIC_SERVER_URL;
 
-export const updateUserRole = async (id, role, token) => {
+export const changeUserRole = async (id, role, token) => {
   const res = await fetch(`${baseURl}/admin/users/${id}/role`, {
     method: "PATCH",
-    headers: { 
+    headers: {
       "Content-Type": "application/json",
-      "Authorization": `Bearer ${token}` 
+      "Authorization": `Bearer ${token}`,
     },
     body: JSON.stringify({ role }),
   });
-  const data = await res.json();
-  return data;
+  return await res.json();
 };
 
 export const deleteUser = async (id, token) => {
   const res = await fetch(`${baseURl}/admin/users/${id}`, {
     method: "DELETE",
     headers: {
-      "Authorization": `Bearer ${token}` 
-    }
+      "Authorization": `Bearer ${token}`,
+    },
   });
-  const data = await res.json();
-  return data;
+  return await res.json();
 };
 
 export const updatePromptStatus = async (id, status, rejectionFeedback = "", token) => {

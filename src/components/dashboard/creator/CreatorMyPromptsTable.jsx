@@ -12,7 +12,9 @@ import {
   HiStar,
 } from "react-icons/hi";
 import EditPromptModal from "../user/EditPromptModal"; 
-import AnalyticsModal from "../user/AnalyticsModal"; 
+import CreatorAnalyticModal from "./CreatorAnalyticModal";
+
+
 
 const statusStyles = {
   pending: "bg-amber-500/10 text-amber-400 border-amber-500/20 shadow-[0_0_12px_rgba(245,158,11,0.05)]",
@@ -20,7 +22,6 @@ const statusStyles = {
   rejected: "bg-rose-500/10 text-rose-400 border-rose-500/20 shadow-[0_0_12px_rgba(244,63,94,0.05)]",
 };
 
-// 🎯 পেরেন্ট থেকে 'token' প্রপ্স রিসিভ করা হলো
 export default function CreatorMyPromptsTable({ prompts, token }) {
   const [items, setItems] = useState(prompts || []);
   const [deletingId, setDeletingId] = useState(null);
@@ -153,7 +154,8 @@ export default function CreatorMyPromptsTable({ prompts, token }) {
       )}
 
       {viewingAnalytics && (
-        <AnalyticsModal
+        <CreatorAnalyticModal
+          isOpen={!!viewingAnalytics}
           prompt={viewingAnalytics}
           onClose={() => setViewingAnalytics(null)}
         />

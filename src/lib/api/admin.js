@@ -6,7 +6,7 @@ export const getAdminAnalytics = async (token) => {
     method: "GET",
     headers: { 
       "Content-Type": "application/json",
-      "Authorization": `Bearer ${token}` // 🎯 জিরো বাগ ফিক্সিং হেডার
+      "Authorization": `Bearer ${token}` 
     },
     cache: "no-store"
   });

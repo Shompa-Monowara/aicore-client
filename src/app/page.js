@@ -2,16 +2,18 @@
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { authClient } from "@/lib/auth-client";
-import { getFeaturedPrompts, getTopCreators, getAllPublicReviews } from "@/lib/api/prompts";
+import { getFeaturedPrompts , getAllPublicReviews } from "@/lib/api/prompts";
 import { Spinner } from "@heroui/react";
 
-// 🧩 আপনার ল্যান্ডিং পেজের মেইন কম্পোনেন্টগুলো
+
 import Banner from "@/components/Banner";
 import FeaturedPrompts from "@/components/FeaturedPrompts";
 import WhyChooseUs from "@/components/WhyChooseUs";
-import TopCreators from "@/components/TopCreators"; 
-import CustomerReviews from "@/components/CustomerReviews";
+; 
+
 import ExtraSections from "@/components/ExtraSections";
+import TopCreators from "@/components/TopCreators";
+import CustomerReviews from "@/components/CustomerReviews";
 
 
 const fadeInUp = {
@@ -99,7 +101,7 @@ export default function Home() {
       />
       
      
-      <CustomerReviews 
+      <CustomerReviews
         reviews={reviews} 
         containerVariants={staggerContainer} 
         fadeInUp={fadeInUp} 

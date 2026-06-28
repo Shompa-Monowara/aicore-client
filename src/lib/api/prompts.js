@@ -87,13 +87,11 @@ export const getAllPublicReviews = async () => {
   }
 };
 
-// ==========================================
-//  ANALYTICS ROUTES
-// ==========================================
+
 
 export const getCreatorAnalytics = async (email, token) => {
-  if (!email) return null;
-  const res = await fetch(`${baseURl}/api/creator/analytics?email=${email}`, {
+  if (!email || !token) return null;
+  const res = await fetch(`${baseURl}/creator/analytics?email=${email}`, {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
@@ -101,6 +99,7 @@ export const getCreatorAnalytics = async (email, token) => {
     },
     cache: "no-store",
   });
+  if (!res.ok) return null;
   return await res.json();
 };
 
@@ -133,3 +132,4 @@ export const getTopCreators = async () => {
     return [];
   }
 };
+

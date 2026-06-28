@@ -154,12 +154,13 @@ export default function MyPromptsTable({ prompts, token }) {
       )}
 
       {/* Analytics Modal */}
-      {viewingAnalytics && (
-        <AnalyticsModal
-          prompt={viewingAnalytics}
-          onClose={() => setViewingAnalytics(null)}
-        />
-      )}
+   {viewingAnalytics && (
+  <AnalyticsModal
+    isOpen={Boolean(viewingAnalytics)} // যখন viewingAnalytics এ ডাটা থাকবে তখনই মোডাল ওপেন হবে
+    prompt={viewingAnalytics}
+    onClose={() => setViewingAnalytics(null)} // ক্লোজ করলে স্টেট নাল হয়ে মোডাল বন্ধ হবে
+  />
+)}
     </>
   );
 }

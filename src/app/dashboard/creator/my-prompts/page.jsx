@@ -12,9 +12,9 @@ export const dynamic = "force-dynamic";
 export default async function CreatorMyPromptsPage() {
   const session = await auth.api.getSession({ headers: await headers() });
   const email = session?.user?.email;
-  const token = await getTokenServer(); // 🎯 টোকেন রিড
+  const token = await getTokenServer(); 
 
-  const promptsData = await getMyPrompts(email, token); // 🎯 টোকেন পাস
+  const promptsData = await getMyPrompts(email, token); 
   const prompts = promptsData?.data || [];
 
   return (

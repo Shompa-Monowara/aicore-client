@@ -8,7 +8,7 @@ import { addPrompt } from "@/lib/action/prompts";
 import toast from "react-hot-toast";
 import { authClient } from "@/lib/auth-client";
 
-export default function CreatorAddPromptForm() {
+export default function CreatorAddPromptForm({ totalExistingPrompts, role, token }) {
   const [loading, setLoading] = useState(false);
   const [imagePreview, setImagePreview] = useState(null);
   const fileInputRef = useRef(null);
@@ -53,7 +53,7 @@ export default function CreatorAddPromptForm() {
         category: data.category,
         aiTool: data.aiTool,
         tags: data.tags ? data.tags.split(",").map(tag => tag.trim()) : [],
-        difficulty: data.difficulty, // 🎯 ফিক্সড: difficultyLevel -> difficulty
+        difficulty: data.difficulty,
         visibility: data.visibility,
         usageInstructions: data.usageInstructions,
         thumbnail: uploadedImageUrl,
@@ -65,7 +65,7 @@ export default function CreatorAddPromptForm() {
         creatorRole: "creator"
       };
 
-      const result = await addPrompt(promptProduct);
+      const result = await addPrompt(promptProduct, token);
 
       if (result.acknowledged) {
         toast.success("Creator prompt submitted successfully for review!");
