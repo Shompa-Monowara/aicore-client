@@ -103,12 +103,12 @@ export default function AllPromptsPage() {
 
   return (
     <div className="min-h-screen bg-[#080810] text-white">
-      {/* 🔮 ব্যাকগ্রাউন্ড গ্লো ইফেক্ট */}
+      
       <div className="absolute top-0 left-1/4 w-[500px] h-[500px] bg-purple-900/5 rounded-full blur-[140px] pointer-events-none" />
 
       <div className="max-w-7xl mx-auto px-4 py-10 relative z-10">
         
-        {/* 🔍 সার্চ বার থিম টিউনিং */}
+     
         <div className="mb-8">
           <div className="relative group">
             <input
@@ -125,7 +125,7 @@ export default function AllPromptsPage() {
         </div>
 
         <div className="flex flex-col lg:flex-row gap-8">
-          {/* 🛠️ বাম পাশের ফিল্টার প্যানেল */}
+          
           <div className="w-full lg:w-64 shrink-0">
             <PromptFilters
               category={category}
@@ -138,10 +138,9 @@ export default function AllPromptsPage() {
             />
           </div>
 
-          {/* 🎴 ডান পাশের মেইন গ্রিড এরিয়া */}
           <div className="flex-1">
             
-            {/* 📊 সর্টিং টগল প্যানেল */}
+         
             <div className="bg-zinc-900/10 border border-purple-950/20 rounded-2xl px-5 py-3.5 flex items-center gap-3 mb-6 flex-wrap backdrop-blur-sm">
               <span className="text-zinc-500 text-xs font-bold uppercase tracking-wider">Sort By:</span>
               <div className="flex gap-2 flex-wrap">
@@ -161,13 +160,13 @@ export default function AllPromptsPage() {
               </div>
             </div>
 
-            {/* 🌀 লোডিং অ্যানিমেশন */}
+           
             {loading ? (
               <div className="flex justify-center items-center py-32">
                 <div className="w-10 h-10 border-[3px] border-purple-500 border-t-transparent rounded-full animate-spin" />
               </div>
             ) : prompts.length === 0 ? (
-              /* 🤖 নো ডাটা ফাউন্ড কার্ড */
+            
               <div className="text-center py-28 bg-zinc-900/10 border border-purple-950/10 rounded-3xl backdrop-blur-sm">
                 <p className="text-4xl mb-4">🤖</p>
                 <h3 className="text-lg font-bold text-white">No Prompts Found</h3>
@@ -183,7 +182,7 @@ export default function AllPromptsPage() {
               </div>
             ) : (
               <>
-                {/* 🎴 প্রম্পট কার্ডস গ্রিড */}
+              
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                   {prompts.map((prompt) => (
                     <PromptCard
@@ -194,7 +193,7 @@ export default function AllPromptsPage() {
                   ))}
                 </div>
 
-                {/* 📊 প্রিমিয়াম কাস্টম পেজিনেশন */}
+              
                 {totalPages > 1 && (
                   <div className="flex flex-col items-center gap-4 mt-12 w-full pt-6 border-t border-purple-950/10">
                     <p className="text-zinc-500 text-xs font-medium">
