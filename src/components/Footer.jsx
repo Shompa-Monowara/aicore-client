@@ -8,21 +8,22 @@ import { FaXTwitter } from "react-icons/fa6";
 export default function Footer() {
   const pathname = usePathname();
 
-  // ড্যাশবোর্ডে ফুটার হাইড রাখার লজিক
+ 
   if (pathname.includes("dashboard")) {
     return null;
   }
 
   return (
-    <footer className="mt-auto border-t border-purple-500/10 bg-[#080810]/80 backdrop-blur-xl shadow-[0_-4px_30px_rgba(0,0,0,0.3)] px-4 sm:px-6 text-zinc-400">
+    <footer className="mt-auto border-t border-purple-500/10 bg-[#080810]/80 backdrop-blur-xl shadow-[0_-4px_30px_rgba(0,0,0,0.3)] px-6 sm:px-8 text-zinc-400">
       <div className="mx-auto max-w-7xl">
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-[1.4fr_1fr_1fr_1fr] gap-12 py-16">
+       
+        <div className="grid grid-cols-1 lg:grid-cols-[1.4fr_2.6fr] gap-x-8 gap-y-12 py-12 sm:py-16">
 
-          {/* 🎯 লোগো সেকশন (ন্যাভবারের সাথে ১০০% ম্যাচ) */}
-          <div className="flex flex-col space-y-5">
+          
+          <div className="flex flex-col items-center text-center lg:items-start lg:text-left space-y-5">
             <Link href="/">
-              <div className="flex items-center gap-3 cursor-pointer group w-fit">
+              <div className="flex items-center gap-3 cursor-pointer group w-fit mx-auto lg:mx-0">
                 <div className="relative flex items-center justify-center transition-transform duration-300 group-hover:scale-105">
                   <svg
                     className="h-7 w-7 text-purple-500 drop-shadow-[0_0_10px_rgba(168,85,247,0.5)]"
@@ -53,165 +54,110 @@ export default function Footer() {
               </div>
             </Link>
 
-            <p className="max-w-xs text-sm leading-relaxed text-zinc-400/90 font-medium">
+            <p className="max-w-md text-sm leading-relaxed text-zinc-400/90 font-medium">
               Discover, copy, and create production-ready AI prompts for Gemini,
               ChatGPT, Claude, and Midjourney. Secure workflow.
             </p>
           </div>
 
-          {/* Platform */}
-          <div>
-            <h3 className="mb-4 text-xs font-bold uppercase tracking-wider text-white">
-              Platform
-            </h3>
-
-            <ul className="space-y-3 text-sm font-semibold">
-              <li>
-                <Link
-                  href="/all-prompts"
-                  className="transition-colors hover:text-purple-400"
-                >
-                  All Prompts
-                </Link>
-              </li>
-
-              <li>
-                <Link
-                  href="/#trending"
-                  className="transition-colors hover:text-purple-400"
-                >
-                  Trending Prompts
-                </Link>
-              </li>
-
-              <li>
-                <Link
-                  href="/auth/login"
-                  className="transition-colors hover:text-purple-400"
-                >
-                  Login
-                </Link>
-              </li>
-
-              <li>
-                <Link
-                  href="/auth/register"
-                  className="transition-colors hover:text-purple-400"
-                >
-                  Register
-                </Link>
-              </li>
-            </ul>
-          </div>
-
-          {/* Resources */}
-          <div>
-            <h3 className="mb-4 text-xs font-bold uppercase tracking-wider text-white">
-              Resources
-            </h3>
-
-            <ul className="space-y-3 text-sm font-semibold">
-              <li>
-                <Link
-                  href="/#ui-elements"
-                  className="transition-colors hover:text-purple-400"
-                >
-                  UI Elements
-                </Link>
-              </li>
-
-              <li>
-                <Link
-                  href="/#features"
-                  className="transition-colors hover:text-purple-400"
-                >
-                  Platform Benefits
-                </Link>
-              </li>
-
-              <li>
-                <Link
-                  href="/pricing"
-                  className="transition-colors hover:text-purple-400"
-                >
-                  Pricing Plan
-                </Link>
-              </li>
-
-              <li>
-                <Link
-                  href="/#reviews"
-                  className="transition-colors hover:text-purple-400"
-                >
-                  Customer Reviews
-                </Link>
-              </li>
-            </ul>
-          </div>
-
-          {/* Connect */}
-          <div className="flex flex-col space-y-4">
-            <div>
+          
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-x-4 gap-y-10 w-full">
+            
+            {/* Platform */}
+            <div className="flex flex-col justify-self-start">
               <h3 className="mb-4 text-xs font-bold uppercase tracking-wider text-white">
-                Connect
+                Platform
               </h3>
+              <ul className="space-y-3 text-sm font-semibold">
+                <li>
+                  <Link href="/all-prompts" className="transition-colors hover:text-purple-400">
+                    All Prompts
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/#trending" className="transition-colors hover:text-purple-400">
+                    Trending Prompts
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/auth/login" className="transition-colors hover:text-purple-400">
+                    Login
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/auth/register" className="transition-colors hover:text-purple-400">
+                    Register
+                  </Link>
+                </li>
+              </ul>
+            </div>
 
-              <div className="flex flex-wrap gap-2.5">
-                <Link
-                  href="#"
-                  className="flex h-9 w-9 items-center justify-center rounded-xl border border-purple-950/40 bg-purple-950/10 text-zinc-400 transition-all hover:border-purple-500/40 hover:bg-purple-500/10 hover:text-purple-400"
-                >
-                  <FaXTwitter className="h-4 w-4" />
-                </Link>
+            {/* Resources */}
+            <div className="flex flex-col justify-self-end sm:justify-self-start pr-2">
+              <h3 className="mb-4 text-xs font-bold uppercase tracking-wider text-white">
+                Resources
+              </h3>
+              <ul className="space-y-3 text-sm font-semibold">
+                <li>
+                  <Link href="/#ui-elements" className="transition-colors hover:text-purple-400">
+                    UI Elements
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/#features" className="transition-colors hover:text-purple-400">
+                    Platform Benefits
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/pricing" className="transition-colors hover:text-purple-400">
+                    Pricing Plan
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/#reviews" className="transition-colors hover:text-purple-400">
+                    Customer Reviews
+                  </Link>
+                </li>
+              </ul>
+            </div>
 
-                <Link
-                  href="#"
-                  className="flex h-9 w-9 items-center justify-center rounded-xl border border-purple-950/40 bg-purple-950/10 text-zinc-400 transition-all hover:border-purple-500/40 hover:bg-purple-500/10 hover:text-purple-400"
-                >
-                  <FaGithub className="h-4 w-4" />
-                </Link>
+         
+            <div className="col-span-2 sm:col-span-1 flex flex-col space-y-4 pt-2 sm:pt-0">
+              <div>
+                <h3 className="mb-4 text-xs font-bold uppercase tracking-wider text-white">
+                  Connect
+                </h3>
+                <div className="flex flex-wrap gap-2.5">
+                  <Link href="#" className="flex h-9 w-9 items-center justify-center rounded-xl border border-purple-950/40 bg-purple-950/10 text-zinc-400 transition-all hover:border-purple-500/40 hover:bg-purple-500/10 hover:text-purple-400">
+                    <FaXTwitter className="h-4 w-4" />
+                  </Link>
+                  <Link href="#" className="flex h-9 w-9 items-center justify-center rounded-xl border border-purple-950/40 bg-purple-950/10 text-zinc-400 transition-all hover:border-purple-500/40 hover:bg-purple-500/10 hover:text-purple-400">
+                    <FaGithub className="h-4 w-4" />
+                  </Link>
+                  <Link href="#" className="flex h-9 w-9 items-center justify-center rounded-xl border border-purple-950/40 bg-purple-950/10 text-zinc-400 transition-all hover:border-purple-500/40 hover:bg-purple-500/10 hover:text-purple-400">
+                    <FaLinkedinIn className="h-4 w-4" />
+                  </Link>
+                  <Link href="#" className="flex h-9 w-9 items-center justify-center rounded-xl border border-purple-950/40 bg-purple-950/10 text-zinc-400 transition-all hover:border-purple-500/40 hover:bg-purple-500/10 hover:text-purple-400">
+                    <FaGlobe className="h-4 w-4" />
+                  </Link>
+                </div>
+              </div>
 
-                <Link
-                  href="#"
-                  className="flex h-9 w-9 items-center justify-center rounded-xl border border-purple-950/40 bg-purple-950/10 text-zinc-400 transition-all hover:border-purple-500/40 hover:bg-purple-500/10 hover:text-purple-400"
-                >
-                  <FaLinkedinIn className="h-4 w-4" />
-                </Link>
-
-                <Link
-                  href="#"
-                  className="flex h-9 w-9 items-center justify-center rounded-xl border border-purple-950/40 bg-purple-950/10 text-zinc-400 transition-all hover:border-purple-500/40 hover:bg-purple-500/10 hover:text-purple-400"
-                >
-                  <FaGlobe className="h-4 w-4" />
-                </Link>
+              <div className="text-xs text-zinc-500">
+                <p className="font-semibold">Questions? Support at:</p>
+                <a href="mailto:support@aicore.com" className="mt-1 block text-sm font-semibold text-zinc-300 transition-colors hover:text-purple-400">
+                  support@aicore.com
+                </a>
               </div>
             </div>
 
-            <div className="text-xs text-zinc-500">
-              <p className="font-semibold">
-                Questions? Support at:
-              </p>
-
-              <a
-                href="mailto:support@aicore.com"
-                className="mt-1 block text-sm font-semibold text-zinc-300 transition-colors hover:text-purple-400"
-              >
-                support@aicore.com
-              </a>
-            </div>
           </div>
         </div>
 
         {/* Bottom Bar */}
         <div className="border-t border-purple-950/20 py-8 text-center text-xs tracking-wide text-zinc-500 flex flex-col sm:flex-row items-center justify-center gap-1.5 font-medium">
-          <p>
-            © {new Date().getFullYear()} AICore. All rights reserved.
-          </p>
-
-          <span className="hidden sm:inline text-purple-950/40">
-            |
-          </span>
-
+          <p>© {new Date().getFullYear()} AICore. All rights reserved.</p>
+          <span className="hidden sm:inline text-purple-950/40">|</span>
           <p>
             Powered by{" "}
             <span className="font-bold bg-gradient-to-r from-purple-400 to-indigo-400 bg-clip-text text-transparent">

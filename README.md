@@ -1,36 +1,55 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# AI Prompt Sharing & Marketplace Platform
 
-## Getting Started
+## AiCore
 
-First, run the development server:
+AI Prompt Sharing & Marketplace Platform is a modern web application where users can discover, create, bookmark, review, and manage AI prompts for tools like ChatGPT, Gemini, Claude, and Midjourney. The platform provides role-based dashboards, secure authentication, premium prompt access, and an admin moderation system to ensure high-quality content.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+---
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Live URL
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
+🌐 Live Site: https://aicore-client.vercel.app
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+---
 
-## Learn More
+## Key Features
 
-To learn more about Next.js, take a look at the following resources:
+- JWT Authentication & Google Login
+- Role-Based Dashboard (User, Creator & Admin)
+- Create, Update & Delete AI Prompts
+- Bookmark & Copy Prompt
+- Review & Rating System
+- Premium Prompt Access with Stripe Payment
+- Admin Prompt Moderation
+- Backend Search, Filter & Sorting
+- Analytics Dashboard using Recharts
+- Responsive Design with Framer Motion Animations
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+---
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## NPM Packages Used
 
-## Deploy on Vercel
+### Frontend
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+- next
+- react
+- tailwindcss
+- axios
+- framer-motion
+- react-hook-form
+- react-icons
+- react-hot-toast
+- @tanstack/react-query
+- recharts
+- lucid-icon
+- better-auth
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+### Backend
+
+- express
+- mongodb
+- jsonwebtoken
+- jose
+- cors
+- dotenv
+- stripe

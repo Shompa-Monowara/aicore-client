@@ -99,11 +99,11 @@ export default async function ProfilePage() {
           </div>
 
           <div className="bg-zinc-900/40 border border-purple-950/20 rounded-xl p-5">
-            <HiOutlineCheckCircle className="text-xl text-emerald-400" />
+            <HiOutlineCheckCircle className="text-xl  text-purple-400" />
             <p className="text-[11px] font-bold uppercase tracking-wider text-zinc-500 mt-2">
               Account Status
             </p>
-            <p className="text-2xl font-bold text-emerald-400 mt-1">
+            <p className="text-2xl font-bold  text-purple-400 mt-1">
               {role === "admin" ? "Super Admin" : role === "creator" ? "Verified Creator" : "Verified Member"}
             </p>
           </div>
