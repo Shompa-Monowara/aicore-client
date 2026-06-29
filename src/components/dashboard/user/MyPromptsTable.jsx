@@ -20,9 +20,9 @@ const statusStyles = {
   rejected: "bg-rose-500/10 text-rose-400 border-rose-500/20 shadow-[0_0_12px_rgba(244,63,94,0.05)]",
 };
 
-// 🎯 ১. প্রপ্স এর ভেতর পেরেন্ট সার্ভার পেজ থেকে পাঠানো 'token' রিসিভ করা হলো
+
 export default function MyPromptsTable({ prompts, token }) {
-  const [items, setItems] = useState(prompts || []); // সেফগার্ড হিসেবে খালি অ্যারে
+  const [items, setItems] = useState(prompts || []);
   const [deletingId, setDeletingId] = useState(null);
   const [editingPrompt, setEditingPrompt] = useState(null);
   const [viewingAnalytics, setViewingAnalytics] = useState(null); 
@@ -31,7 +31,7 @@ export default function MyPromptsTable({ prompts, token }) {
     if (!confirm("Are you sure you want to delete this prompt?")) return;
     setDeletingId(id);
     try {
-      // 🎯 ২. ডিলিট অ্যাকশন চেইনে আর্গুমেন্ট হিসেবে সিকিউরড সার্ভার 'token' পাস করা হলো
+    
       const result = await deletePrompt(id, token);
       if (result && result.deletedCount > 0) {
         setItems((prev) => prev.filter((p) => p._id !== id));
@@ -156,9 +156,9 @@ export default function MyPromptsTable({ prompts, token }) {
       {/* Analytics Modal */}
    {viewingAnalytics && (
   <AnalyticsModal
-    isOpen={Boolean(viewingAnalytics)} // যখন viewingAnalytics এ ডাটা থাকবে তখনই মোডাল ওপেন হবে
+    isOpen={Boolean(viewingAnalytics)}
     prompt={viewingAnalytics}
-    onClose={() => setViewingAnalytics(null)} // ক্লোজ করলে স্টেট নাল হয়ে মোডাল বন্ধ হবে
+    onClose={() => setViewingAnalytics(null)}
   />
 )}
     </>

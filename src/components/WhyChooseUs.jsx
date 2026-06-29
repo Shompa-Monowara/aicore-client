@@ -3,7 +3,7 @@ import React from "react";
 import { motion } from "framer-motion";
 
 export default function WhyChooseUs() {
-  // 🎯 আইকনের পরিবর্তে ডাইনামিক এবং প্রিমিয়াম Unsplash ইমেজ যুক্ত করা হলো
+
   const benefits = [
     {
       image: "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=400&auto=format&fit=crop&q=80",

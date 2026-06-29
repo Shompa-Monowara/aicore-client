@@ -32,10 +32,10 @@ const CreatorAnalyticModal = ({ isOpen, onClose, prompt }) => {
   const tags = Array.isArray(prompt.tags) ? prompt.tags : [];
 
   return (
-    // আপনার ডেমো মোডালের মতো isOpen এবং onOpenChange এর সঠিক প্রপ্স হ্যান্ডলিং
+    // 
     <Modal isOpen={isOpen} onOpenChange={onClose}>
       <Modal.Backdrop>
-        {/* placement="auto" দিয়ে সেন্টারিং নিশ্চিত করা হলো */}
+       
         <Modal.Container placement="auto">
           
           {/* max-w-xl উইডথ এবং max-h অবিকল ডেমো ফাইলের মতো রেন্ডার করা হয়েছে */}

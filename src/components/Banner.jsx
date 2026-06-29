@@ -87,12 +87,12 @@ export default function Banner() {
           >
             Explore Prompts
           </button>
-          <button 
-            onClick={() => router.push("/create-prompt")} // assuming you have this route
-            className="px-6 py-3 rounded-xl font-bold bg-zinc-900 border border-zinc-800 hover:border-zinc-700 transition-all text-sm"
-          >
-            Share a Prompt
-          </button>
+         <button 
+  onClick={() => router.push("/all-prompts")} 
+  className="px-6 py-3 rounded-xl font-bold bg-zinc-900 border border-zinc-800 hover:border-zinc-700 transition-all text-sm"
+>
+  Share a Prompt
+</button>
         </motion.div>
 
         {/* Search Bar Section */}

@@ -44,7 +44,7 @@ export default function ExtraSections({ fadeInUp }) {
           viewport={{ once: true }}
           className="relative rounded-3xl overflow-hidden bg-gradient-to-br from-zinc-900/40 to-purple-950/20 border border-purple-900/30 p-8 md:p-12 text-center"
         >
-          {/* ✨ ব্যাকগ্রাউন্ড গ্লো লাইট */}
+        
           <div className="absolute -top-12 -right-12 w-64 h-64 bg-purple-600/10 rounded-full blur-[80px] pointer-events-none" />
           <div className="absolute -bottom-12 -left-12 w-64 h-64 bg-indigo-600/10 rounded-full blur-[80px] pointer-events-none" />
 

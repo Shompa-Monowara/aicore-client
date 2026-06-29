@@ -2,18 +2,17 @@
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { authClient } from "@/lib/auth-client";
-import { getFeaturedPrompts , getAllPublicReviews } from "@/lib/api/prompts";
-import { Spinner } from "@heroui/react";
 
+import { Spinner } from "@heroui/react";
 
 import Banner from "@/components/Banner";
 import FeaturedPrompts from "@/components/FeaturedPrompts";
 import WhyChooseUs from "@/components/WhyChooseUs";
-; 
 
 import ExtraSections from "@/components/ExtraSections";
 import TopCreators from "@/components/TopCreators";
 import CustomerReviews from "@/components/CustomerReviews";
+import { getFeaturedPrompts, getTopCreators, getAllPublicReviews } from "@/lib/api/prompts";
 
 
 const fadeInUp = {

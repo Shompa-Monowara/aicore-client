@@ -35,6 +35,7 @@ export default function PromptDetailClient({
   reviews,
   user: initialUser, 
   initialBookmarked,
+  token,
 }) {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -104,7 +105,7 @@ export default function PromptDetailClient({
       return;
     }
     try {
-      const result = await incrementCopyCount(prompt._id, liveUser.email);
+      const result = await incrementCopyCount(prompt._id, liveUser.email, token);
       if (result?.limitReached) {
         toast.error(result.message || "Free users can only copy up to 3 prompts. Upgrade to Premium!");
         return;
@@ -127,7 +128,7 @@ export default function PromptDetailClient({
     if (!liveUser) return requireLogin();
     setBookmarkLoading(true);
     try {
-      const result = await toggleBookmark(liveUser.email, prompt._id.toString());
+      const result = await toggleBookmark(liveUser.email, prompt._id.toString(), token);
       setIsBookmarked(result.bookmarked);
       if (typeof result.bookmarkCount === "number") {
         setBookmarkCount(result.bookmarkCount);

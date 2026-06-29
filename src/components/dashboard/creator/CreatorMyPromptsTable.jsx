@@ -32,7 +32,7 @@ export default function CreatorMyPromptsTable({ prompts, token }) {
     if (!confirm("Are you sure you want to delete this prompt?")) return;
     setDeletingId(id);
     try {
-      // 🎯 ডিলিট অ্যাকশনে সার্ভার টোকেন পাস করা হলো
+    
       const result = await deletePrompt(id, token);
       if (result && result.deletedCount > 0) {
         setItems((prev) => prev.filter((p) => p._id !== id));

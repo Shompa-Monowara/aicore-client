@@ -75,9 +75,21 @@ export const getUserReviews = async (email, token) => {
   return await res.json();
 };
 
+// export const getAllPublicReviews = async () => {
+//   try {
+//     const res = await fetch(`${baseURl}/reviews`, { cache: "no-store" });
+//     if (!res.ok) return [];
+//     const result = await res.json();
+//     return result?.data || [];
+//   } catch (error) {
+//     console.error("Error fetching public reviews:", error);
+//     return [];
+//   }
+// };
+
 export const getAllPublicReviews = async () => {
   try {
-    const res = await fetch(`${baseURl}/reviews`, { cache: "no-store" });
+    const res = await fetch(`${baseURl}/reviews/public`, { cache: "no-store" }); // ✅ /reviews/public
     if (!res.ok) return [];
     const result = await res.json();
     return result?.data || [];
@@ -87,11 +99,9 @@ export const getAllPublicReviews = async () => {
   }
 };
 
-
-
 export const getCreatorAnalytics = async (email, token) => {
   if (!email || !token) return null;
-  const res = await fetch(`${baseURl}/creator/analytics?email=${email}`, {
+  const res = await fetch(`${baseURl}/api/creator/analytics?email=${email}`, {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
@@ -103,33 +113,77 @@ export const getCreatorAnalytics = async (email, token) => {
   return await res.json();
 };
 
-// ==========================================
-//  LANDING PAGE FEATURED PRODUCTS
-// ==========================================
-
+  // HOME PAGE — FEATURED PROMPTS & TOP CREATORS
 export const getFeaturedPrompts = async () => {
   try {
-    const res = await fetch(`${baseURl}/prompts/public?limit=6`, { cache: "no-store" });
+    const res = await fetch(`${baseURl}/prompts/featured`, {
+      cache: "no-store",
+    });
     if (!res.ok) return [];
     const result = await res.json();
     return result?.data || [];
   } catch (error) {
-    console.error("Error inside getFeaturedPrompts:", error);
+    console.error("Error fetching featured prompts:", error);
     return [];
   }
 };
 
 export const getTopCreators = async () => {
   try {
-    const res = await fetch(`${baseURl}/api/creators/top`, { cache: "no-store" });
-    if (!res.ok) {
-      console.error("Top Creators API response error:", res.status);
-      return [];
-    }
-    return await res.json();
+    const res = await fetch(`${baseURl}/creators/top`, {
+      cache: "no-store",
+    });
+    if (!res.ok) return [];
+    const result = await res.json();
+    return result?.data || [];
   } catch (error) {
-    console.error("Fetch failed inside getTopCreators:", error);
+    console.error("Error fetching top creators:", error);
     return [];
   }
 };
+
+
+// export const getCreatorAnalytics = async (email, token) => {
+//   if (!email || !token) return null;
+//   const res = await fetch(`${baseURl}/creator/analytics?email=${email}`, {
+//     method: "GET",
+//     headers: {
+//       "Content-Type": "application/json",
+//       "Authorization": `Bearer ${token}`,
+//     },
+//     cache: "no-store",
+//   });
+//   if (!res.ok) return null;
+//   return await res.json();
+// };
+
+// ==========================================
+//  LANDING PAGE FEATURED PRODUCTS
+// ==========================================
+
+// export const getFeaturedPrompts = async () => {
+//   try {
+//     const res = await fetch(`${baseURl}/prompts/public?limit=6`, { cache: "no-store" });
+//     if (!res.ok) return [];
+//     const result = await res.json();
+//     return result?.data || [];
+//   } catch (error) {
+//     console.error("Error inside getFeaturedPrompts:", error);
+//     return [];
+//   }
+// };
+
+// export const getTopCreators = async () => {
+//   try {
+//     const res = await fetch(`${baseURl}/api/creators/top`, { cache: "no-store" });
+//     if (!res.ok) {
+//       console.error("Top Creators API response error:", res.status);
+//       return [];
+//     }
+//     return await res.json();
+//   } catch (error) {
+//     console.error("Fetch failed inside getTopCreators:", error);
+//     return [];
+//   }
+// };
 

@@ -3,14 +3,14 @@ import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
 import MyPromptsTable from "@/components/dashboard/user/MyPromptsTable";
 import { HiOutlineExclamationCircle } from "react-icons/hi";
-import { getTokenServer } from "@/lib/getTokenServer"; // 🎯 টোকেন ইম্পোর্ট
+import { getTokenServer } from "@/lib/getTokenServer"; 
 
 export default async function MyPromptsPage() {
   const session = await auth.api.getSession({ headers: await headers() });
   const email = session?.user?.email;
-  const token = await getTokenServer(); // 🎯 টোকেন রিড
+  const token = await getTokenServer(); 
 
-  const promptsData = await getMyPrompts(email, token); // 🎯 টোকেন পাস
+  const promptsData = await getMyPrompts(email, token); 
   const prompts = promptsData?.data || [];
 
   return (

@@ -1,4 +1,3 @@
-// lib/api/admin.js
 const baseURl = process.env.NEXT_PUBLIC_SERVER_URL;
 
 export const getAdminAnalytics = async (token) => {
@@ -14,8 +13,8 @@ export const getAdminAnalytics = async (token) => {
   return data;
 };
 
-export const getAllUsers = async (token) => {
-  const res = await fetch(`${baseURl}/admin/users`, {
+export const getAllUsers = async (token, page = 1, limit = 10) => {
+  const res = await fetch(`${baseURl}/admin/users?page=${page}&limit=${limit}`, {
     method: "GET",
     headers: { 
       "Content-Type": "application/json",

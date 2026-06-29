@@ -1,17 +1,26 @@
 import Link from "next/link";
 import { Comment } from "@gravity-ui/icons";
 import MyReviewsTable from "@/components/dashboard/user/MyReviewsTable";
+import { getUserReviews } from "@/lib/api/prompts";
+import { auth } from "@/lib/auth";
+import { headers } from "next/headers";
+import { getTokenServer } from "@/lib/getTokenServer";
 
-export default function MyReviewsPage() {
+export const dynamic = "force-dynamic";
 
-  const reviews = [];
+export default async function MyReviewsPage() {
+  const session = await auth.api.getSession({ headers: await headers() });
+  const email = session?.user?.email;
+  const token = await getTokenServer();
+
+  const reviewsData = await getUserReviews(email, token);
+  const reviews = reviewsData?.data || [];
 
   return (
     <div className="max-w-7xl mx-auto p-4 md:p-6 relative">
-    
+
       <div className="absolute top-0 right-1/4 w-[350px] h-[350px] bg-purple-900/5 rounded-full blur-[120px] pointer-events-none" />
 
-    
       <div className="mb-8 relative z-10">
         <h1 className="text-2xl md:text-3xl font-black text-white tracking-tight">
           My Product Reviews
@@ -21,10 +30,9 @@ export default function MyReviewsPage() {
         </p>
       </div>
 
-     
       <div className="mt-8 bg-zinc-900/10 border border-purple-950/20 rounded-2xl overflow-hidden backdrop-blur-sm shadow-[0_8px_32px_rgba(0,0,0,0.5)] relative z-10">
         {reviews.length === 0 ? (
-        
+
           <div className="flex flex-col items-center justify-center text-center py-20 px-6 space-y-4">
             <div className="w-12 h-12 rounded-xl border border-purple-950/40 bg-purple-950/10 flex items-center justify-center text-purple-400 shadow-[0_0_15px_rgba(168,85,247,0.1)]">
               <Comment className="size-5" />
@@ -45,7 +53,7 @@ export default function MyReviewsPage() {
             </Link>
           </div>
         ) : (
-        
+
           <MyReviewsTable reviews={reviews} />
         )}
       </div>
