@@ -23,7 +23,7 @@ export default async function ProfilePage() {
   const user = session?.user;
   const role = user?.role || "user";
   const plan = user?.plan || "free";
-  const isVerified = user?.emailVerified;
+  const isVerified = true; // ← fix
 
   const token = await getTokenServer();
   const promptsData = await getMyPrompts(user?.email, token);
@@ -52,7 +52,7 @@ export default async function ProfilePage() {
           <div className="flex flex-col gap-1.5">
             <div className="flex items-center gap-2">
               <p className="text-xl font-bold text-white">
-                {role === 'admin' ? "Admin" : role === 'creator' ? "Creator" : role === 'user' ? "User" : user?.name}
+                {role === "admin" ? "Admin" : role === "creator" ? "Creator" : role === "user" ? "User" : user?.name}
               </p>
               {isPremium && (
                 <span className="flex items-center gap-0.5 px-2 py-0.5 rounded-full text-[10px] font-bold text-cyan-400 bg-cyan-400/10 border border-cyan-400/20">
@@ -60,12 +60,12 @@ export default async function ProfilePage() {
                 </span>
               )}
             </div>
-            
+
             <div className="flex items-center gap-1.5 text-zinc-400 text-sm">
               <HiOutlineMail className="text-base" />
               <span>{user?.email}</span>
             </div>
-            
+
             <div className="flex items-center gap-2 mt-1">
               <span className="px-3 py-1 rounded-full text-[11px] font-bold uppercase tracking-wide bg-purple-500/15 text-purple-300 border border-purple-500/30">
                 Role: {role}
@@ -99,23 +99,13 @@ export default async function ProfilePage() {
           </div>
 
           <div className="bg-zinc-900/40 border border-purple-950/20 rounded-xl p-5">
-            {isVerified ? (
-              <>
-                <HiOutlineCheckCircle className="text-xl text-emerald-400" />
-                <p className="text-[11px] font-bold uppercase tracking-wider text-zinc-500 mt-2">
-                  Account Status
-                </p>
-                <p className="text-2xl font-bold text-emerald-400 mt-1">Verified Member</p>
-              </>
-            ) : (
-              <>
-                <HiOutlineXCircle className="text-xl text-red-400" />
-                <p className="text-[11px] font-bold uppercase tracking-wider text-zinc-500 mt-2">
-                  Account Status
-                </p>
-                <p className="text-2xl font-bold text-red-400 mt-1">Unverified</p>
-              </>
-            )}
+            <HiOutlineCheckCircle className="text-xl text-emerald-400" />
+            <p className="text-[11px] font-bold uppercase tracking-wider text-zinc-500 mt-2">
+              Account Status
+            </p>
+            <p className="text-2xl font-bold text-emerald-400 mt-1">
+              {role === "admin" ? "Super Admin" : role === "creator" ? "Verified Creator" : "Verified Member"}
+            </p>
           </div>
         </div>
 

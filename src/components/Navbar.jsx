@@ -15,7 +15,7 @@ const Navbar = () => {
   const { data: session } = authClient.useSession();
   const user = session?.user;
   const pathname = usePathname();
- 
+
   if (pathname.includes("dashboard")) {
     return null;
   }
@@ -27,8 +27,6 @@ const Navbar = () => {
   return (
     <nav className="sticky top-0 z-50 w-full border-b border-purple-950/20 bg-[#080810]/70 backdrop-blur-md">
       <header className="mx-auto flex h-20 max-w-7xl items-center justify-between px-4 sm:px-6">
-        
-       
         <div className="flex items-center gap-4">
           <button
             className="text-white md:hidden focus:outline-none cursor-pointer p-1 rounded-lg hover:bg-white/5 transition-colors"
@@ -37,7 +35,7 @@ const Navbar = () => {
           >
             {isMenuOpen ? <HiX className="h-6 w-6" /> : <HiMenu className="h-6 w-6" />}
           </button>
-          
+
           <Link href="/">
             <div className="flex items-center gap-2.5 cursor-pointer group">
               <div className="relative flex items-center justify-center transition-transform duration-300 group-hover:scale-105">
@@ -53,7 +51,6 @@ const Navbar = () => {
           </Link>
         </div>
 
-       
         <ul className="hidden items-center gap-8 md:flex">
           <li>
             <Link href="/" className={`text-sm font-semibold transition-colors ${pathname === "/" ? "text-purple-400" : "text-zinc-400 hover:text-white"}`}>
@@ -67,7 +64,6 @@ const Navbar = () => {
           </li>
         </ul>
 
-       
         <div className="hidden items-center gap-4 md:flex">
           {!user ? (
             <>
@@ -84,9 +80,9 @@ const Navbar = () => {
             <div className="flex items-center gap-3">
               <div className="flex flex-col items-end">
                 <span className="text-xs font-black text-zinc-400 uppercase tracking-wider leading-none">
-                  {user?.role === 'admin' ? "Admin" : user?.role === 'creator' ? "Creator" : "User"} 
+                  {user?.role === 'admin' ? "Admin" : user?.role === 'creator' ? "Creator" : "User"}
                 </span>
-                
+
                 {(user?.plan === "premium" || user?.plan === "PRO LIFETIME") && (
                   <span className="flex items-center gap-0.5 text-[9px] font-black text-purple-400 mt-1 uppercase tracking-widest">
                     <HiBadgeCheck className="text-purple-400 text-xs" /> PRO
@@ -101,7 +97,7 @@ const Navbar = () => {
                     <Avatar.Fallback className="bg-purple-950 text-purple-300 font-bold">{user?.name?.charAt(0) || "U"}</Avatar.Fallback>
                   </Avatar>
                 </Dropdown.Trigger>
-                
+
                 <Dropdown.Popover>
                   <div className="px-4 pt-4 pb-2 bg-[#0d0d15] border border-purple-950/40 text-white rounded-t-xl w-48">
                     <p className="text-xs font-bold truncate">{user?.name}</p>
@@ -109,7 +105,7 @@ const Navbar = () => {
                   </div>
                   <Dropdown.Menu className="bg-[#0d0d15] border-x border-b border-purple-950/40 text-zinc-400 rounded-b-xl w-48 p-1">
                     <Dropdown.Item id="dashboard" textValue="Dashboard" className="hover:bg-purple-950/30 hover:text-purple-400 rounded-lg transition-colors">
-                      <Link className="flex items-center gap-2 text-xs font-semibold py-1" href={`/dashboard/${user?.role}`}>
+                      <Link className="flex items-center gap-2 text-xs font-semibold py-1" href={`/dashboard/${user?.role}/profile`}>
                         <MdDashboard className="text-purple-400 text-sm" /> Dashboard
                       </Link>
                     </Dropdown.Item>
@@ -124,13 +120,12 @@ const Navbar = () => {
         </div>
       </header>
 
-      
       {isMenuOpen && (
         <div className="border-t border-purple-950/20 bg-[#080810] md:hidden p-4 space-y-4 animate-fadeIn">
           <ul className="space-y-3">
             <li>
-              <Link 
-                href="/" 
+              <Link
+                href="/"
                 onClick={() => setIsMenuOpen(false)}
                 className={`block text-sm font-semibold p-2 rounded-lg ${pathname === "/" ? "bg-purple-950/30 text-purple-400" : "text-zinc-400"}`}
               >
@@ -138,8 +133,8 @@ const Navbar = () => {
               </Link>
             </li>
             <li>
-              <Link 
-                href="/all-prompts" 
+              <Link
+                href="/all-prompts"
                 onClick={() => setIsMenuOpen(false)}
                 className={`block text-sm font-semibold p-2 rounded-lg ${pathname === "/all-prompts" ? "bg-purple-950/30 text-purple-400" : "text-zinc-400"}`}
               >
@@ -147,7 +142,7 @@ const Navbar = () => {
               </Link>
             </li>
           </ul>
-          
+
           <div className="pt-2 border-t border-purple-950/20 flex flex-col gap-2">
             {!user ? (
               <>
@@ -173,7 +168,7 @@ const Navbar = () => {
                   </div>
                 </div>
                 <div className="flex gap-2">
-                  <Link href={`/dashboard/${user?.role}`} onClick={() => setIsMenuOpen(false)} className="p-2 bg-purple-950/40 text-purple-400 rounded-lg border border-purple-900/30">
+                  <Link href={`/dashboard/${user?.role}/profile`} onClick={() => setIsMenuOpen(false)} className="p-2 bg-purple-950/40 text-purple-400 rounded-lg border border-purple-900/30">
                     <MdDashboard />
                   </Link>
                   <button onClick={() => { handleSignOut(); setIsMenuOpen(false); }} className="p-2 bg-rose-950/30 text-rose-400 rounded-lg border border-rose-900/20 cursor-pointer">

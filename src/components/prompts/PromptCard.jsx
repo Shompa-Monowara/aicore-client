@@ -29,7 +29,7 @@ export default function PromptCard({ prompt, onViewDetails }) {
         {/* Badges Row  */}
         <div className="flex items-center justify-between gap-2 mb-1">
           <div className="flex items-center gap-2">
-            {/* AI Engine ব্যাজ */}
+            
             <span className="text-xs font-semibold px-3 py-1 rounded-full border border-white/20 text-white/80">
               {prompt.aiTool?.toUpperCase()}
             </span>
