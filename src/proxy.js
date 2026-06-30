@@ -18,11 +18,11 @@
 const role = (user.role || "user").toLowerCase();
 const plan = (user.plan || "free").toLowerCase();
 
-  //  if (pathname.startsWith("/payment") && plan === "premium") {
+   if (pathname.startsWith("/payment") && plan === "premium") {
     
-  //   const dashboardRoute = `/dashboard/${role}/profile`;
-  //  return NextResponse.redirect(new URL(dashboardRoute, request.url));
-  //  }
+     const dashboardRoute = `/dashboard/${role}/profile`;
+    return NextResponse.redirect(new URL(dashboardRoute, request.url));
+   }
 
   
   if (pathname.startsWith("/dashboard/admin") && role !== "admin") {
