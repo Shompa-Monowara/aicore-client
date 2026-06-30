@@ -5,8 +5,11 @@ import { useSearchParams } from "next/navigation";
 import { loadStripe } from "@stripe/stripe-js";
 import { Elements, CardElement, useStripe, useElements } from "@stripe/react-stripe-js";
 import { authClient } from "@/lib/auth-client";
+
 import { HiCheckCircle, HiCreditCard, HiSparkles } from "react-icons/hi";
+
 import toast from "react-hot-toast";
+import { confirmPayment } from "@/lib/api/payments";
 
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY);
 const SERVER_URL = process.env.NEXT_PUBLIC_SERVER_URL;
@@ -17,9 +20,12 @@ function CheckoutForm({ clientSecret }) {
   const [loading, setLoading] = useState(false);
   const searchParams = useSearchParams();
   const promptId = searchParams.get("prompt_id");
+  const returnUrl = searchParams.get("returnUrl");
   const { data: session } = authClient.useSession(); 
+  
 
   const handleSubmit = async (e) => {
+    
     e.preventDefault();
     if (!stripe || !elements) return;
 
@@ -30,16 +36,48 @@ function CheckoutForm({ clientSecret }) {
         card: elements.getElement(CardElement),
       },
     });
+    console.log("Payment Intent:", paymentIntent);
 
-    if (error) {
-      toast.error(error.message);
-      setLoading(false);
-    } else if (paymentIntent.status === "succeeded") {
-      toast.success("🎉 Payment successful!");
-      const userEmail = session?.user?.email || ""; 
-      window.location.href = `${SERVER_URL}/api/payment/success?session_id=${paymentIntent.id}&email=${encodeURIComponent(userEmail)}&prompt_id=${promptId || ""}`;
-    }
-  };
+    // if (error) {
+    //   toast.error(error.message);
+    //   setLoading(false);
+    // } else if (paymentIntent.status === "succeeded") {
+    //   toast.success("🎉 Payment successful!");
+    //   const userEmail = session?.user?.email || ""; 
+    //   // window.location.href = `${SERVER_URL}/api/payment/success?session_id=${paymentIntent.id}&email=${encodeURIComponent(userEmail)}&prompt_id=${promptId || ""}`;
+    //     window.location.href =
+    //    `${SERVER_URL}/api/payment/success
+    //      ?session_id=${paymentIntent.id}
+    //     &email=${encodeURIComponent(userEmail)}
+    //              &prompt_id=${promptId}
+    //        &returnUrl=${encodeURIComponent(returnUrl || "")}`;
+    //                   }
+
+                 if (error) {
+  toast.error(error.message);
+  setLoading(false);
+} else if (paymentIntent.status === "succeeded") {
+  toast.success("🎉 Payment successful!");
+
+  const userEmail = session?.user?.email || "";
+    const token = await authClient.getToken();
+  await confirmPayment({
+    sessionId: paymentIntent.id,
+    email: userEmail,
+    amount: 5,
+    productId: promptId || "premium_access",
+    title: "Premium Plan",
+    },
+  token
+      );
+
+  window.location.href =
+    `${SERVER_URL}/api/payment/success?session_id=${paymentIntent.id}` +
+    `&email=${encodeURIComponent(userEmail)}` +
+    `&prompt_id=${promptId || ""}` +
+    `&returnUrl=${encodeURIComponent(returnUrl || "")}`;
+}
+                };
 
   return (
     <form onSubmit={handleSubmit} className="flex flex-col justify-between h-full min-h-[350px]">

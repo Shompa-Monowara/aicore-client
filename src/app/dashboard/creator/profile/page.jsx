@@ -134,6 +134,7 @@ export default async function CreatorProfilePage() {
             </div>
             <Link
               href="/payment"
+              
               className="shrink-0 px-5 py-2.5 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 text-white text-sm font-bold hover:opacity-90 transition-all shadow-lg shadow-purple-950/30 cursor-pointer"
             >
               Upgrade Now ($5)

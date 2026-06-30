@@ -5,17 +5,20 @@ import { auth } from "@/lib/auth";
 
 export async function POST(request) {
   try {
-    // Better Auth সেশন রিট্রিভ করা
+   
     const userSession = await auth.api.getSession({
       headers: await headers(),
     });
+
+    console.log("Session:", userSession);
+    console.log("User:", userSession?.user);
     const user = userSession?.user;
 
     if (!user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    // হোস্টেড সেশনের পরিবর্তে ইনলাইন পেমেন্ট ইনটেন্ট তৈরি
+    
     const paymentIntent = await stripe.paymentIntents.create({
       amount: 500, // $5.00 = 500 cents
       currency: "usd",
