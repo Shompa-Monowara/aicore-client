@@ -9,7 +9,7 @@ import { addPrompt } from "@/lib/action/prompts";
 import toast from "react-hot-toast";
 import { authClient } from "@/lib/auth-client";
 
-export default function AddPromptForm({ totalExistingPrompts }) {
+export default function AddPromptForm({ totalExistingPrompts, token }) {
   const [loading, setLoading] = useState(false);
   const [imagePreview, setImagePreview] = useState(null);
   const fileInputRef = useRef(null);
@@ -39,6 +39,12 @@ export default function AddPromptForm({ totalExistingPrompts }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    if (!token) {
+      toast.error("Authentication token missing. Please re-login.");
+      return;
+    }
+
     if (isFreeLimitReached) {
       toast.error("Limit reached! Free accounts cannot submit more than 3 prompts.");
       return;
@@ -62,25 +68,27 @@ export default function AddPromptForm({ totalExistingPrompts }) {
         category: data.category,
         aiTool: data.aiTool,
         tags: data.tags ? data.tags.split(",").map(tag => tag.trim()) : [],
-        difficulty: data.difficulty, // 🎯 ফিক্সড: difficultyLevel -> difficulty
+        difficulty: data.difficulty,
         visibility: data.visibility,
-        usageInstructions: data.usageInstructions, 
+        usageInstructions: data.usageInstructions,
         thumbnail: uploadedImageUrl,
         copyCount: 0,
         status: "pending",
         email: userEmail,
-        creatorEmail: userEmail, 
-        creatorName: userName, 
-        creatorRole: "user" 
+        creatorEmail: userEmail,
+        creatorName: userName,
+        creatorRole: "user"
       };
 
-      const result = await addPrompt(promptProduct);
+      const result = await addPrompt(promptProduct, token);
 
       if (result && result.acknowledged) {
         toast.success("User prompt submitted successfully for review!");
         e.target.reset();
-        setImagePreview(null); 
+        setImagePreview(null);
         window.location.reload();
+      } else {
+        toast.error(result?.message || "Submission failed. Please try again.");
       }
     } catch (error) {
       console.error("Submission failed:", error);
