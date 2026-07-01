@@ -8,20 +8,25 @@ import { imageUpload } from "@/lib/imgUpload";
 import { addPrompt } from "@/lib/action/prompts";
 import toast from "react-hot-toast";
 import { authClient } from "@/lib/auth-client";
+import Link from "next/link";
 
 export default function AddPromptForm({ totalExistingPrompts, token }) {
   const [loading, setLoading] = useState(false);
   const [imagePreview, setImagePreview] = useState(null);
   const fileInputRef = useRef(null);
 
-  // সাধারণ ইউজারদের জন্য ৩টি সাবমিশন লিমিট
-  const isFreeLimitReached = totalExistingPrompts >= 3;
-
-  const { data: session } = authClient.useSession();
+const { data: session, isPending } = authClient.useSession();
   const userEmail = session?.user?.email;
   const userName = session?.user?.name;
+  const userPlan = (session?.user?.plan || "free").toLowerCase();
+  const isPremium = userPlan === "premium";
 
-  const handleUploadClick = () => { fileInputRef.current.click(); };
+
+  const isFreeLimitReached = !isPremium && totalExistingPrompts >= 3;
+
+
+
+ const handleUploadClick = () => { fileInputRef.current.click(); };
 
   const handleFileChange = (e) => {
     const file = e.target.files[0];
@@ -93,10 +98,18 @@ export default function AddPromptForm({ totalExistingPrompts, token }) {
     } catch (error) {
       console.error("Submission failed:", error);
       toast.error("Something went wrong. Please try again.");
-    } finally {
+    }   finally {
       setLoading(false);
     }
   };
+
+  if (isPending) {
+    return (
+      <div className="w-full max-w-4xl bg-zinc-900/10 border border-purple-950/20 p-8 rounded-2xl flex items-center justify-center min-h-[300px]">
+        <p className="text-zinc-500 text-sm animate-pulse">Loading...</p>
+      </div>
+    );
+  }
 
   if (isFreeLimitReached) {
     return (
@@ -110,9 +123,13 @@ export default function AddPromptForm({ totalExistingPrompts, token }) {
             Free accounts are restricted to 3 active prompt architectures. Upgrade your workspace to premium network status to unlock unlimited templates.
           </p>
         </div>
-        <Button className="bg-gradient-to-r from-purple-600 to-indigo-600 font-bold text-xs uppercase tracking-wider text-white rounded-xl py-5 px-6 shadow-lg shadow-purple-950/30 cursor-pointer">
-          Upgrade to Premium ($5)
-        </Button>
+         <Link
+                      href="/payment"
+                      
+                      className="shrink-0 px-5 py-2.5 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 text-white text-sm font-bold hover:opacity-90 transition-all shadow-lg shadow-purple-950/30 cursor-pointer"
+                    >
+                      Upgrade Now ($5)
+                    </Link>
       </div>
     );
   }

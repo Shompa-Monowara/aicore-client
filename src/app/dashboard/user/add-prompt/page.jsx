@@ -2,12 +2,16 @@ import AddPromptForm from "@/components/dashboard/user/AddPromptForm";
 import { getMyPrompts } from "@/lib/api/prompts";
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
-import { getTokenServer } from "@/lib/getTokenServer"; 
+import { getTokenServer } from "@/lib/getTokenServer";
+
+
+
+
 export default async function AddPromptPage() {
   const session = await auth.api.getSession({ headers: await headers() });
-  const token = await getTokenServer(); 
-  
-  const promptsData = await getMyPrompts(session?.user?.email, token); 
+  const token = await getTokenServer();
+
+  const promptsData = await getMyPrompts(session?.user?.email, token);
 
   return (
     <div className="w-full py-6 pl-4 md:pl-8 pr-4">
@@ -21,7 +25,7 @@ export default async function AddPromptPage() {
       </div>
 
       <div className="w-full max-w-4xl ml-0">
-        <AddPromptForm totalExistingPrompts={promptsData.totalData || 0} token={token} /> 
+        <AddPromptForm totalExistingPrompts={promptsData?.totalData || 0} token={token} />
       </div>
     </div>
   );
